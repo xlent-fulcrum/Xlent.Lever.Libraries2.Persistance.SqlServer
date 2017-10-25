@@ -18,22 +18,23 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
     public partial class SingleTableHandler<TDatabaseItem> : Database
         where TDatabaseItem : ITableItem, IValidatable, new()
     {
-        private readonly TDatabaseItem _databaseItem;
+        protected ISqlTableMetadata TableMetadata { get; }
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="connectionString"></param>
-        public SingleTableHandler(string connectionString)
+        /// <param name="tableMetadata"></param>
+        public SingleTableHandler(string connectionString, ISqlTableMetadata tableMetadata)
             : base(connectionString)
         {
-            _databaseItem = new TDatabaseItem();
+            TableMetadata = tableMetadata;
         }
 
         /// <summary>
         /// The name of the table that this class handles.
         /// </summary>
-        public string TableName => _databaseItem.TableName;
+        public string TableName => TableMetadata.TableName;
     }
 
     public partial class SingleTableHandler<TDatabaseItem> : ICrudAll<TDatabaseItem, Guid>
@@ -58,7 +59,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
             InternalContract.RequireValidated(item, nameof(item));
             using (var db = NewSqlConnection())
             {
-                await db.ExecuteAsync(SqlHelper.Create(item), item);
+                await db.ExecuteAsync(SqlHelper.Create(TableMetadata), item);
             }
             return item.Id;
         }
@@ -73,7 +74,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
             };
             using (var db = NewSqlConnection())
             {
-                await db.ExecuteAsync(SqlHelper.Delete(item), new {Id = id});
+                await db.ExecuteAsync(SqlHelper.Delete(TableMetadata), new {Id = id});
             }
         }
 
@@ -104,14 +105,14 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
             InternalContract.RequireValidated(item, nameof(item));
             var oldItem = await ReadAsync(item.Id);
             if (oldItem == null)
-                throw new FulcrumNotFoundException($"Table {item.TableName} did not contain an item with id {item.Id}");
+                throw new FulcrumNotFoundException($"Table {TableMetadata.TableName} did not contain an item with id {item.Id}");
             if (!string.Equals(oldItem.ETag, item.ETag))
                 throw new FulcrumConflictException(
                     "Could not update. Your data was stale. Please reload and try again.");
             item.ETag = Guid.NewGuid().ToString();
             using (var db = NewSqlConnection())
             {
-                var count = await db.ExecuteAsync(SqlHelper.Update(item, oldItem.ETag), item);
+                var count = await db.ExecuteAsync(SqlHelper.Update(TableMetadata, oldItem.ETag), item);
                 if (count == 0)
                     throw new FulcrumConflictException(
                         "Could not update. Your data was stale. Please reload and try again.");
@@ -174,11 +175,11 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
         }
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TDatabaseItem, Guid>> SearchWhereAsync(string @where = null, string orderBy = null, object param = null, int offset = 0, int limit = 100)
+        public async Task<PageEnvelope<TDatabaseItem, Guid>> SearchWhereAsync(string where = null, string orderBy = null, object param = null, int offset = 0, int limit = 100)
         {
             InternalContract.RequireGreaterThanOrEqualTo(0, offset, nameof(offset));
             InternalContract.RequireGreaterThanOrEqualTo(0, limit, nameof(limit));
-            var total = CountItemsWhere(@where, param);
+            var total = CountItemsWhere(where, param);
             var data = await SearchInternalWhereAsync(param, where, orderBy, offset, limit);
             var dataAsArray = data as TDatabaseItem[] ?? data.ToArray();
             return new PageEnvelope<TDatabaseItem, Guid>
@@ -196,11 +197,11 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
         }
 
         /// <inheritdoc />
-        public async Task<TDatabaseItem> SearchWhereSingle(string @where, object param = null)
+        public async Task<TDatabaseItem> SearchWhereSingle(string where, object param = null)
         {
             if (where == null) where = "1=1";
             var item = new TDatabaseItem();
-            return await SearchAdvancedSingleAsync($"SELECT * FROM [{item.TableName}] WHERE ({@where})", param);
+            return await SearchAdvancedSingleAsync($"SELECT * FROM [{TableMetadata.TableName}] WHERE ({where})", param);
         }
 
         /// <inheritdoc />
@@ -211,7 +212,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
         }
 
         /// <inheritdoc />
-        public async Task<TDatabaseItem> SearchFirstWhereAsync(string @where = null, string orderBy = null, object param = null)
+        public async Task<TDatabaseItem> SearchFirstWhereAsync(string where = null, string orderBy = null, object param = null)
         {
             var result = await SearchInternalWhereAsync(param, where, orderBy, 0, 1);
             return result.SingleOrDefault();
@@ -226,11 +227,11 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
         }
 
         /// <inheritdoc />
-        public int CountItemsWhere(string @where = null, object param = null)
+        public int CountItemsWhere(string where = null, object param = null)
         {
             if (where == null) where = "1=1";
             var item = new TDatabaseItem();
-            return CountItemsAdvanced("SELECT COUNT(*)", $"FROM [{item.TableName}] WHERE ({@where})", param);
+            return CountItemsAdvanced("SELECT COUNT(*)", $"FROM [{TableMetadata.TableName}] WHERE ({where})", param);
         }
 
         /// <inheritdoc />
@@ -263,7 +264,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
             InternalContract.RequireGreaterThanOrEqualTo(0, limit, nameof(limit));
             if (where == null) where = "1=1";
             var item = new TDatabaseItem();
-            return await SearchInternalAsync(param, $"SELECT * FROM [{item.TableName}] WHERE ({where})", orderBy, offset, limit);
+            return await SearchInternalAsync(param, $"SELECT * FROM [{TableMetadata.TableName}] WHERE ({where})", orderBy, offset, limit);
         }
 
         /// <summary>

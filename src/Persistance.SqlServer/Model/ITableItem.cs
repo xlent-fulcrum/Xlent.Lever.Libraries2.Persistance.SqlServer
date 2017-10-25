@@ -6,7 +6,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Model
     /// <summary>
     /// Metadata for creating SQL statmements
     /// </summary>
-    public interface ITableItem : IStorableItem<Guid>, IOptimisticConcurrencyControlByETag, ISqlTableMetadata
+    public interface ITableItem : IStorableItem<Guid>, IOptimisticConcurrencyControlByETag
     {
     }
 }

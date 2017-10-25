@@ -9,17 +9,13 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Models
     /// <summary>
     /// The database columns that are expected in every facade database table
     /// </summary>
-    public class ManyToMany: TableItem, IManyToMany
+    public abstract class ManyToManyMetadata: ISqlTableMetadata
     {
         /// <inheritdoc />
-        public Guid TypeId { get; set; }
+        public abstract string TableName { get; }
         /// <inheritdoc />
-        public Guid FirstId { get; set; }
+        public virtual IEnumerable<string> CustomColumnNames => new[] { "TypeId", "FirstId", "SecondId", "FirstSortOrder", "SecondSortOrder" };
         /// <inheritdoc />
-        public Guid SecondId { get; set; }
-        /// <inheritdoc />
-        public int? FirstSortOrder { get; set; }
-        /// <inheritdoc />
-        public int? SecondSortOrder { get; set; }
+        public virtual string OrderBy => "FirstId, FirstSortOrder";
     }
 }

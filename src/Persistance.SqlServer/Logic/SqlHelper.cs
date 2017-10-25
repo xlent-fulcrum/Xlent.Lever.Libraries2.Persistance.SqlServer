@@ -7,36 +7,36 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
 {
     internal static class SqlHelper
     {
-        public static string Create(ITableItem item) => $"INSERT INTO dbo.[{item.TableName}] ({ColumnList(item)}) values ({ArgumentList(item)})";
+        public static string Create(ISqlTableMetadata tableMetadata) => $"INSERT INTO dbo.[{tableMetadata.TableName}] ({ColumnList(tableMetadata)}) values ({ArgumentList(tableMetadata)})";
 
-        public static string Read(ITableItem item, string where) => $"SELECT {ColumnList(item)} FROM [{item.TableName}] WHERE {where}";
+        public static string Read(ISqlTableMetadata tableMetadata, string where) => $"SELECT {ColumnList(tableMetadata)} FROM [{tableMetadata.TableName}] WHERE {where}";
 
-        public static string Read(ITableItem item, string where, string orderBy) => $"SELECT {ColumnList(item)} FROM [{item.TableName}] WHERE {where} ORDER BY {orderBy}";
+        public static string Read(ISqlTableMetadata tableMetadata, string where, string orderBy) => $"SELECT {ColumnList(tableMetadata)} FROM [{tableMetadata.TableName}] WHERE {where} ORDER BY {orderBy}";
         
 
-        public static string Update(ITableItem item, string oldEtag) => $"UPDATE [{item.TableName}] SET {UpdateList(item)} WHERE Id = @Id AND ETag == '{oldEtag}'";
+        public static string Update(ISqlTableMetadata tableMetadata, string oldEtag) => $"UPDATE [{tableMetadata.TableName}] SET {UpdateList(tableMetadata)} WHERE Id = @Id AND ETag == '{oldEtag}'";
 
-        public static string Delete(ITableItem item) => $"DELETE FROM [{item.TableName}] WHERE Id = @Id";
+        public static string Delete(ISqlTableMetadata tableMetadata) => $"DELETE FROM [{tableMetadata.TableName}] WHERE Id = @Id";
 
-        public static string ColumnList(ITableItem item) => string.Join(", ", AllColumnNames(item).Select(name => $"[{name}]"));
+        public static string ColumnList(ISqlTableMetadata item) => string.Join(", ", AllColumnNames(item).Select(name => $"[{name}]"));
 
-        public static string ArgumentList(ITableItem item) => string.Join(", ", AllColumnNames(item).Select(name => $"@{name}"));
+        public static string ArgumentList(ISqlTableMetadata item) => string.Join(", ", AllColumnNames(item).Select(name => $"@{name}"));
 
-        public static string UpdateList(ITableItem item) => string.Join(", ", AllColumnNames(item).Select(name => $"[{name}]=@{name}"));
+        public static string UpdateList(ISqlTableMetadata item) => string.Join(", ", AllColumnNames(item).Select(name => $"[{name}]=@{name}"));
 
-        public static IEnumerable<string> NonCustomColumnNames(ITableItem item)
+        public static IEnumerable<string> NonCustomColumnNames(ISqlTableMetadata tableMetadata)
         {
             var list = new List<string> {"Id", "ETag"};
-            var timeStamped = item as ITimeStamped;
+            var timeStamped = tableMetadata as ITimeStamped;
             if (timeStamped == null) return list;
             list.AddRange(new [] {"CreatedAt", "UpdatedAt"});
             return list;
         }
 
-        public static IEnumerable<string> AllColumnNames(ITableItem item)
+        public static IEnumerable<string> AllColumnNames(ISqlTableMetadata tableMetadata)
         {
-            var list = NonCustomColumnNames(item).ToList();
-            list.AddRange(item.CustomColumnNames);
+            var list = NonCustomColumnNames(tableMetadata).ToList();
+            list.AddRange(tableMetadata.CustomColumnNames);
             return list;
         }
     }

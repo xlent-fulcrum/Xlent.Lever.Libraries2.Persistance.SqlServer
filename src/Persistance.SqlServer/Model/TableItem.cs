@@ -19,22 +19,10 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Model
         public string ETag { get; set; }
 
         /// <inheritdoc />
-        public abstract string TableName { get; }
-
-        /// <inheritdoc />
-        public abstract string OrderBy { get; }
-
-        /// <inheritdoc />
-        public abstract IEnumerable<string> CustomColumnNames { get; }
-
-        /// <inheritdoc />
         public virtual void Validate(string errorLocaction, string propertyPath = "")
         {
             FulcrumValidate.IsNotDefaultValue(Id, nameof(Id), errorLocaction);
             FulcrumValidate.IsNotNullOrWhiteSpace(ETag, nameof(ETag), errorLocaction);
-            FulcrumValidate.IsNotNullOrWhiteSpace(TableName, nameof(TableName), errorLocaction);
-            FulcrumValidate.IsNotNull(OrderBy, nameof(OrderBy), errorLocaction);
-            FulcrumValidate.IsNotNull(CustomColumnNames, nameof(CustomColumnNames), errorLocaction);
         }
 
         /// <inheritdoc />

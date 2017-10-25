@@ -42,8 +42,8 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Logic
         /// <param name="firstTableLogic"></param>
         /// <param name="secondTableLogic"></param>
         /// <param name="typeId"></param>
-        protected ManyToManyHandler(string connectionString, TFirstTable firstTableLogic, TSecondTable secondTableLogic, Guid typeId = default(Guid))
-            : base(connectionString)
+        protected ManyToManyHandler(string connectionString, ISqlTableMetadata tableMetadata, TFirstTable firstTableLogic, TSecondTable secondTableLogic, Guid typeId = default(Guid))
+            : base(connectionString, tableMetadata)
         {
             _firstTableLogic = firstTableLogic;
             _secondTableLogic = secondTableLogic;
@@ -73,7 +73,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Logic
             param.Add("FirstOrSecondId", typeId);
             param.Add("TypeId", _typeId);
             param.Add("MaxValue", ignored, null, ParameterDirection.Output);
-            await SearchAdvancedSingleAsync($"SELECT @MaxValue=MAX({firstOrSecond}SortOrder) FROM [{_manyToManyModel.TableName}] WHERE [{firstOrSecond}Id] = @FirstOrSecondId AND TypeId = @TypeId", param);
+            await SearchAdvancedSingleAsync($"SELECT @MaxValue=MAX({firstOrSecond}SortOrder) FROM [{TableMetadata.TableName}] WHERE [{firstOrSecond}Id] = @FirstOrSecondId AND TypeId = @TypeId", param);
             return param.Get<int?>("MaxValue") ?? 0;
         }
 
@@ -109,7 +109,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Logic
             if (item.FirstSortOrder == 1)
             {
                 var existing = await _secondTableLogic.ReadAsync(item.SecondId);
-                FulcrumAssert.IsNotNull(existing, $"{Namespace}: AAB0ED64-7A98-4F75-AC71-E84D3E803B04", $"Expected item {item.SecondId} to exist in table {_secondModel.TableName}.");
+                FulcrumAssert.IsNotNull(existing, $"{Namespace}: AAB0ED64-7A98-4F75-AC71-E84D3E803B04", $"Expected item {item.SecondId} to exist in table {_secondTableLogic.TableName}.");
                 if (_secondTableLogic.NameOfForeignKey(_typeId) != null)
                 {
                     await _secondTableLogic.UpdateForeignKey(existing, item.FirstId, _typeId);
@@ -118,7 +118,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Logic
             if (item.SecondSortOrder == 1)
             {
                 var existing = await _firstTableLogic.ReadAsync(item.FirstId);
-                FulcrumAssert.IsNotNull(existing, $"{Namespace}: AC32BD77-4188-4E0C-AB88-4844B1B9216F", $"Expected item {item.FirstId} to exist in table {_firstModel.TableName}.");
+                FulcrumAssert.IsNotNull(existing, $"{Namespace}: AC32BD77-4188-4E0C-AB88-4844B1B9216F", $"Expected item {item.FirstId} to exist in table {_firstTableLogic.TableName}.");
                 if (_firstTableLogic.NameOfForeignKey(_typeId) != null)
                 {
                     await _firstTableLogic.UpdateForeignKey(existing, item.SecondId, _typeId);
@@ -218,7 +218,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Logic
             var firstOrSecond = FirstOrSecond(first);
             var addOrSubstract = shiftLeft ? "-" : "+";
             var smallerThanLastValue = lastValue == null ? "" : $"AND {firstOrSecond}SortOrder <= @LastValue";
-            var sqlQuery = $"UPDATE [{_manyToManyModel.TableName}] SET {firstOrSecond}SortOrder = {firstOrSecond}SortOrder{addOrSubstract}1, Etag=NEWID(), [RowUpdatedAt]=GETUTCDATE()" +
+            var sqlQuery = $"UPDATE [{TableMetadata.TableName}] SET {firstOrSecond}SortOrder = {firstOrSecond}SortOrder{addOrSubstract}1, Etag=NEWID(), [RowUpdatedAt]=GETUTCDATE()" +
                 $" WHERE [{firstOrSecond}Id] = @Id AND {firstOrSecond}SortOrder >= @FirstValue {smallerThanLastValue} AND TypeId = @TypeId";
             using (IDbConnection db = NewSqlConnection())
             {
@@ -239,7 +239,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Logic
         {
             using (IDbConnection db = NewSqlConnection())
             {
-                var sqlQuery = $"DELETE FROM [{_manyToManyModel.TableName}] WHERE TypeId = {_typeId} AND ([FirstId] = @Id OR [SecondId] = @Id)";
+                var sqlQuery = $"DELETE FROM [{TableMetadata.TableName}] WHERE TypeId = {_typeId} AND ([FirstId] = @Id OR [SecondId] = @Id)";
                 db.Execute(sqlQuery, new { Id = id });
             }
         }
@@ -296,7 +296,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Logic
         {
             var firstOrSecond = FirstOrSecond(first);
             var other = FirstOrSecond(!first);
-            var selectRest = $"FROM [{_manyToManyModel.TableName}] AS m2m" +
+            var selectRest = $"FROM [{TableMetadata.TableName}] AS m2m" +
                    $" JOIN [{logic.TableName}] AS r ON (r.Id = m2m.{other}Id)" +
                    $" WHERE m2m.[{firstOrSecond}Id] = @OtherId AND m2m.[TypeId] = @TypeId";
             return await logic.SearchAdvancedAsync("SELECT COUNT(r.[Id])", "SELECT r.*", selectRest, $"m2m.[{firstOrSecond}SortOrder]", new { OtherId = otherId, TypeId = _typeId }, offset, limit);
@@ -326,7 +326,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Logic
             if (nameOfPrimaryIdColumn == null) throw new FulcrumNotImplementedException(nameof(nameOfPrimaryIdColumn));
             var firstOrSecond = FirstOrSecond(first);
             var other = FirstOrSecond(!first);
-            var selectRest = $"FROM [{_manyToManyModel.TableName}] AS m2m" +
+            var selectRest = $"FROM [{TableMetadata.TableName}] AS m2m" +
                    $" JOIN [{logic.TableName}] AS r ON (r.Id = m2m.{firstOrSecond}Id) AND {nameOfPrimaryIdColumn} = @OtherId" +
                    $" WHERE m2m.[{other}Id] = @OtherId AND m2m.[TypeId] = @TypeId";
             return await logic.SearchAdvancedAsync("SELECT COUNT(r.[Id])", "SELECT r.*", selectRest, $"m2m.[{other}SortOrder]", new { OtherId = otherId, TypeId = _typeId }, offset, limit);

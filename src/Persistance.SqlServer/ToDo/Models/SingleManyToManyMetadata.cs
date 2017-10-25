@@ -5,10 +5,14 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Models
     /// <summary>
     /// One table to keep all ManyToMany relations
     /// </summary>
-    public class SingleManyToMany : ManyToMany
+    public class SingleManyToManyMetadata : ManyToManyMetadata
     {
+        public SingleManyToManyMetadata(string tableName)
+        {
+            TableName = tableName;
+        }
         /// <inheritdoc />
-        public override string TableName => "SingleManyToMany";
+        public override string TableName { get; }
 
     }
 }
