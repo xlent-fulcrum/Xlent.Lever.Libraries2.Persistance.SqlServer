@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using Xlent.Lever.Libraries2.Core.Storage.Model;
 using Xlent.Lever.Libraries2.Persistance.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
@@ -17,7 +19,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
         /// <param name="offset">The number of items that will be skipped in result.</param>
         /// <param name="limit">The maximum number of items to return.</param>
         /// <returns>The found items.</returns>
-        Task<PageEnvelope<TDatabaseItem>> SearchAllAsync(string orderBy, int offset = 0, int limit = 100);
+        Task<PageEnvelope<TDatabaseItem, Guid>> SearchAllAsync(string orderBy, int offset = 0, int limit = 100);
 
         /// <summary>
         /// Find the items specified by the <paramref name="where"/> clause.
@@ -28,7 +30,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
         /// <param name="offset">The number of items that will be skipped in result.</param>
         /// <param name="limit">The maximum number of items to return.</param>
         /// <returns>The found items.</returns>
-        Task<PageEnvelope<TDatabaseItem>> SearchWhereAsync(string where = null, string orderBy = null, object param = null, int offset = 0, int limit = 100);
+        Task<PageEnvelope<TDatabaseItem, Guid>> SearchWhereAsync(string where = null, string orderBy = null, object param = null, int offset = 0, int limit = 100);
 
         /// <summary>
         /// Both selectes objects and counts them, returning a <see cref="PageEnvelope{TData}"/>
@@ -41,7 +43,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
         /// <param name="offset">The number of items that will be skipped in result.</param>
         /// <param name="limit">The maximum number of items to return.</param>
         /// <returns>The found items.</returns>
-        Task<PageEnvelope<TDatabaseItem>> SearchAdvancedAsync(string countFirst, string selectFirst, string selectRest, string orderBy = null, object param = null, int offset = 0, int limit = 100);
+        Task<PageEnvelope<TDatabaseItem, Guid>> SearchAdvancedAsync(string countFirst, string selectFirst, string selectRest, string orderBy = null, object param = null, int offset = 0, int limit = 100);
 
         /// <summary>
         /// Find the items specified by the <paramref name="where"/> clause and using fields from the <paramref name="param"/>.

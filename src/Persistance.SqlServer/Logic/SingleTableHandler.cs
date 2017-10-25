@@ -52,7 +52,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
             InternalContract.RequireValidated(item, nameof(item));
             using (var db = NewSqlConnection())
             {
-                await db.ExecuteAsync(Helper.Create(item), item);
+                await db.ExecuteAsync(SqlHelper.Create(item), item);
             }
             return item.Id;
         }
@@ -67,7 +67,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
             };
             using (var db = NewSqlConnection())
             {
-                await db.ExecuteAsync(Helper.Delete(item), new { Id = id });
+                await db.ExecuteAsync(SqlHelper.Delete(item), new { Id = id });
             }
         }
 
@@ -102,7 +102,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
             item.ETag = Guid.NewGuid().ToString();
             using (var db = NewSqlConnection())
             {
-                var count = await db.ExecuteAsync(Helper.Update(item, oldItem.ETag), item);
+                var count = await db.ExecuteAsync(SqlHelper.Update(item, oldItem.ETag), item);
                 if (count == 0) throw new FulcrumConflictException("Could not update. Your data was stale. Please reload and try again.");
             }
         }
@@ -126,7 +126,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
         #region ISearch
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TDatabaseItem>> SearchAllAsync(string orderBy, int offset = 0,
+        public async Task<PageEnvelope<TDatabaseItem, Guid>> SearchAllAsync(string orderBy, int offset = 0,
             int limit = PageInfo.DefaultLimit)
         {
             InternalContract.RequireGreaterThanOrEqualTo(0, offset, nameof(offset));
@@ -135,7 +135,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
         }
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TDatabaseItem>> SearchAdvancedAsync(string countFirst, string selectFirst, string selectRest, string orderBy = null, object param = null, int offset = 0, int limit = 100)
+        public async Task<PageEnvelope<TDatabaseItem, Guid>> SearchAdvancedAsync(string countFirst, string selectFirst, string selectRest, string orderBy = null, object param = null, int offset = 0, int limit = 100)
         {
             InternalContract.RequireGreaterThanOrEqualTo(0, offset, nameof(offset));
             InternalContract.RequireGreaterThanOrEqualTo(0, limit, nameof(limit));
@@ -143,7 +143,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
             var selectStatement = selectRest == null ? null : $"{selectFirst} {selectRest}";
             var data = await SearchInternalAsync(param, selectStatement, orderBy, offset, limit);
             var dataAsArray = data as TDatabaseItem[] ?? data.ToArray();
-            return new PageEnvelope<TDatabaseItem>
+            return new PageEnvelope<TDatabaseItem, Guid>
             {
                 Data = dataAsArray,
                 PageInfo = new PageInfo
@@ -158,14 +158,14 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
         }
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TDatabaseItem>> SearchWhereAsync(string @where = null, string orderBy = null, object param = null, int offset = 0, int limit = 100)
+        public async Task<PageEnvelope<TDatabaseItem, Guid>> SearchWhereAsync(string @where = null, string orderBy = null, object param = null, int offset = 0, int limit = 100)
         {
             InternalContract.RequireGreaterThanOrEqualTo(0, offset, nameof(offset));
             InternalContract.RequireGreaterThanOrEqualTo(0, limit, nameof(limit));
             var total = CountItemsWhere(@where, param);
             var data = await SearchInternalWhereAsync(param, where, orderBy, offset, limit);
             var dataAsArray = data as TDatabaseItem[] ?? data.ToArray();
-            return new PageEnvelope<TDatabaseItem>
+            return new PageEnvelope<TDatabaseItem, Guid>
             {
                 Data = dataAsArray,
                 PageInfo = new PageInfo
