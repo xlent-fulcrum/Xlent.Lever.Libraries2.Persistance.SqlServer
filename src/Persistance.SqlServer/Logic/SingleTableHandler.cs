@@ -15,10 +15,11 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
     /// Helper class for advanced SELECT statmements
     /// </summary>
     /// <typeparam name="TDatabaseItem"></typeparam>
-    public class SingleTableHandler<TDatabaseItem> : Database, ICrudAll<TDatabaseItem, Guid>, ISearch<TDatabaseItem>
+    public partial class SingleTableHandler<TDatabaseItem> : Database
         where TDatabaseItem : ITableItem, IValidatable, new()
     {
         private readonly TDatabaseItem _databaseItem;
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -33,6 +34,11 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
         /// The name of the table that this class handles.
         /// </summary>
         public string TableName => _databaseItem.TableName;
+    }
+
+    public partial class SingleTableHandler<TDatabaseItem> : ICrudAll<TDatabaseItem, Guid>
+        where TDatabaseItem : ITableItem, IValidatable, new()
+    {
 
         #region ICrud
 
@@ -67,7 +73,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
             };
             using (var db = NewSqlConnection())
             {
-                await db.ExecuteAsync(SqlHelper.Delete(item), new { Id = id });
+                await db.ExecuteAsync(SqlHelper.Delete(item), new {Id = id});
             }
         }
 
@@ -97,15 +103,21 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
             InternalContract.RequireNotNull(item, nameof(item));
             InternalContract.RequireValidated(item, nameof(item));
             var oldItem = await ReadAsync(item.Id);
-            if (oldItem == null) throw new FulcrumNotFoundException($"Table {item.TableName} did not contain an item with id {item.Id}");
-            if (!string.Equals(oldItem.ETag, item.ETag)) throw new FulcrumConflictException("Could not update. Your data was stale. Please reload and try again.");
+            if (oldItem == null)
+                throw new FulcrumNotFoundException($"Table {item.TableName} did not contain an item with id {item.Id}");
+            if (!string.Equals(oldItem.ETag, item.ETag))
+                throw new FulcrumConflictException(
+                    "Could not update. Your data was stale. Please reload and try again.");
             item.ETag = Guid.NewGuid().ToString();
             using (var db = NewSqlConnection())
             {
                 var count = await db.ExecuteAsync(SqlHelper.Update(item, oldItem.ETag), item);
-                if (count == 0) throw new FulcrumConflictException("Could not update. Your data was stale. Please reload and try again.");
+                if (count == 0)
+                    throw new FulcrumConflictException(
+                        "Could not update. Your data was stale. Please reload and try again.");
             }
         }
+
         #endregion
 
         #region ICrudAll
@@ -121,8 +133,12 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
         {
             throw new NotImplementedException();
         }
-        #endregion
 
+        #endregion
+    }
+    public partial class SingleTableHandler<TDatabaseItem> : ISearch<TDatabaseItem>
+        where TDatabaseItem : ITableItem, IValidatable, new()
+    {
         #region ISearch
 
         /// <inheritdoc />
