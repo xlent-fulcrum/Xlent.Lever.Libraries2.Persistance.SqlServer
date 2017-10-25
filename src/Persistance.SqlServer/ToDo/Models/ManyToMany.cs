@@ -9,7 +9,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Models
     /// <summary>
     /// The database columns that are expected in every facade database table
     /// </summary>
-    public abstract class ManyToMany: TableItem, IManyToMany, IValidatable
+    public abstract class ManyToMany: TableItem, IManyToMany
     {
         /// <summary>
         /// This field makes it possible to store many different many-to-many relationships in the same table.

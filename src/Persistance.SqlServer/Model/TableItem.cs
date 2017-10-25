@@ -10,7 +10,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Model
     /// <remarks>
     /// We recommend to inherit from <see cref="TimeStampedTableItem"/>.
     /// </remarks>
-    public abstract class TableItem : ITableItem
+    public abstract class TableItem : ITableItem, IValidatable
     {
         /// <inheritdoc />
         public Guid Id { get; set; }
@@ -31,7 +31,10 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Model
         public virtual void Validate(string errorLocaction, string propertyPath = "")
         {
             FulcrumValidate.IsNotDefaultValue(Id, nameof(Id), errorLocaction);
-            FulcrumValidate.IsNotDefaultValue(ETag, nameof(ETag), errorLocaction);
+            FulcrumValidate.IsNotNullOrWhiteSpace(ETag, nameof(ETag), errorLocaction);
+            FulcrumValidate.IsNotNullOrWhiteSpace(TableName, nameof(TableName), errorLocaction);
+            FulcrumValidate.IsNotNull(OrderBy, nameof(OrderBy), errorLocaction);
+            FulcrumValidate.IsNotNull(CustomColumnNames, nameof(CustomColumnNames), errorLocaction);
         }
 
         /// <inheritdoc />
