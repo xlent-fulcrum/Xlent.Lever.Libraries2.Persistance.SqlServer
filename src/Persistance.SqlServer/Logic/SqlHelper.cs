@@ -5,7 +5,7 @@ using Xlent.Lever.Libraries2.Persistance.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
 {
-    internal static class Helper
+    internal static class SqlHelper
     {
         public static string Create(ITableItem item) => $"INSERT INTO dbo.[{item.TableName}] ({ColumnList(item)}) values ({ArgumentList(item)})";
 

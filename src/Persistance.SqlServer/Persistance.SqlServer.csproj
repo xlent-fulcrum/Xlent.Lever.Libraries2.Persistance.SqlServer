@@ -47,12 +47,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Logic\Database.cs" />
-    <Compile Include="Logic\Helper.cs" />
+    <Compile Include="Logic\SqlHelper.cs" />
     <Compile Include="Logic\ISearch.cs" />
     <Compile Include="Logic\SingleTableHandler.cs" />
-    <Compile Include="Model\ISqlMetadata.cs" />
+    <Compile Include="Model\ISqlTableMetadata.cs" />
     <Compile Include="Model\ITableItem.cs" />
-    <Compile Include="Model\PageEnvelope.cs" />
     <Compile Include="Model\TableItem.cs" />
     <Compile Include="Model\TimeStampedTableItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -6,7 +6,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Model
     /// <summary>
     /// Metadata for creating SQL statmements
     /// </summary>
-    public interface ISqlMetadata
+    public interface ISqlTableMetadata
     {
         /// <summary>
         /// The name of the database table that will hold this type of items.
