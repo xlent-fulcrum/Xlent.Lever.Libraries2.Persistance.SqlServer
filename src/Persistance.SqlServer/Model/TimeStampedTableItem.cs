@@ -19,7 +19,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Model
         /// <inheritdoc />
         public override void Validate(string errorLocaction, string propertyPath = "")
         {
-            base.Validate(errorLocaction);
+            base.Validate(errorLocaction, propertyPath);
             var now = DateTimeOffset.Now;
             FulcrumValidate.IsTrue(CreatedAt < now, errorLocaction, $"Expected {nameof(CreatedAt)} ({CreatedAt}) to have a value less than the current time ({now}).");
             FulcrumValidate.IsTrue(UpdatedAt < now, errorLocaction, $"Expected {nameof(UpdatedAt)} ({UpdatedAt}) to have a value less than the current time ({now}).");
