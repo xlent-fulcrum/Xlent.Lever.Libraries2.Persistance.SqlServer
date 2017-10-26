@@ -7,8 +7,8 @@ using Xlent.Lever.Libraries2.Persistance.SqlServer.Model;
 namespace Xlent.Lever.Libraries2.Persistance.SqlServer
 {
     public class ForeignKeyTableHandler<TLocalItem, TForeignItem> : GroupedTableHandler<TLocalItem, Guid>
-        where TLocalItem : ITableItem, IValidatable, IStorableItem<Guid>
-        where TForeignItem : ITableItem, IValidatable, IStorableItem<Guid>
+        where TLocalItem : ITableItem, IValidatable
+        where TForeignItem : ITableItem, IValidatable
     {
         public SimpleTableHandler<TForeignItem> ForeignHandler { get; }
 

@@ -9,7 +9,7 @@ using Xlent.Lever.Libraries2.Persistance.SqlServer.Model;
 namespace Xlent.Lever.Libraries2.Persistance.SqlServer
 {
     public class GroupedTableHandler<TDatabaseItem, TGroupColumn> : SimpleTableHandler<TDatabaseItem>, IGrouped<TDatabaseItem, Guid, TGroupColumn>
-        where TDatabaseItem : ITableItem, IValidatable, IStorableItem<Guid>
+        where TDatabaseItem : ITableItem, IValidatable
     {
         public string GroupColumnName { get; }
 
