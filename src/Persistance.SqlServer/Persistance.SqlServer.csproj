@@ -58,14 +58,6 @@
     <Compile Include="Model\TableItem.cs" />
     <Compile Include="Model\TimeStampedTableItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ToDo\Interfaces\IManyToMany.cs" />
-    <Compile Include="ToDo\Interfaces\Interface1.cs" />
-    <Compile Include="ToDo\Interfaces\IPartInManyToMany.cs" />
-    <Compile Include="ToDo\Logic\ManyToManyHandler.cs" />
-    <Compile Include="ToDo\Logic\SingleManyToManyHandler.cs" />
-    <Compile Include="ToDo\Models\ManyToMany.cs" />
-    <Compile Include="ToDo\Models\ManyToManyMetadata.cs" />
-    <Compile Include="ToDo\Models\SingleManyToManyMetadata.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
