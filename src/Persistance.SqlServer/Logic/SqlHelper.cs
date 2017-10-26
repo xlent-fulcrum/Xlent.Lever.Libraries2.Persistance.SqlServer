@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xlent.Lever.Libraries2.Core.Storage.Model;
 using Xlent.Lever.Libraries2.Persistance.SqlServer.Model;
@@ -18,18 +19,24 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
 
         public static string DeleteBasedOnColumnValue(ISqlTableMetadata tableMetadata, string columnName, string variableName = null) => $"DELETE FROM [{tableMetadata.TableName}] WHERE {columnName} = @{variableName ?? columnName}";
 
-        public static string ColumnList(ISqlTableMetadata item) => string.Join(", ", AllColumnNames(item).Select(name => $"[{name}]"));
+        public static string ColumnList(ISqlTableMetadata tableMetadata) => string.Join(", ", AllColumnNames(tableMetadata).Select(name => $"[{name}]"));
 
-        public static string ArgumentList(ISqlTableMetadata item) => string.Join(", ", AllColumnNames(item).Select(name => $"@{name}"));
+        public static string ArgumentList(ISqlTableMetadata tableMetadata) => string.Join(", ", AllColumnNames(tableMetadata).Select(name => $"@{name}"));
 
-        public static string UpdateList(ISqlTableMetadata item) => string.Join(", ", AllColumnNames(item).Select(name => $"[{name}]=@{name}"));
+        public static string UpdateList(ISqlTableMetadata tableMetadata) => string.Join(", ", tableMetadata.CustomColumnNames.Select(name => $"[{name}]=@{name}"), UpdateNonCustomColumns(tableMetadata));
+
+        private static IEnumerable<string> UpdateNonCustomColumns(ISqlTableMetadata tableMetadata)
+        {
+            var list = new List<string> {$"Etag={Guid.NewGuid()}"};
+            if (tableMetadata.UpdatedAtColumnName != null) list.Add($"{tableMetadata.UpdatedAtColumnName}='{DateTimeOffset.Now}'");
+            return list;
+        }
 
         public static IEnumerable<string> NonCustomColumnNames(ISqlTableMetadata tableMetadata)
         {
             var list = new List<string> {"Id", "ETag"};
-            var timeStamped = tableMetadata as ITimeStamped;
-            if (timeStamped == null) return list;
-            list.AddRange(new [] {"CreatedAt", "UpdatedAt"});
+            if (tableMetadata.CreatedAtColumnName != null) list.Add(tableMetadata.CreatedAtColumnName);
+            if (tableMetadata.UpdatedAtColumnName != null) list.Add(tableMetadata.UpdatedAtColumnName);
             return list;
         }
 
