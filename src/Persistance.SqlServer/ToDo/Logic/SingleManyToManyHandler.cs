@@ -12,9 +12,9 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Logic
     /// </summary>
     public abstract class SingleManyToManyHandler<TFirstModel, TFirstTable, TSecondModel, TSecondTable> : ManyToManyHandler<TFirstModel, TFirstTable, ManyToMany, TSecondModel, TSecondTable>
         where TFirstModel : ITableItem, IValidatable, new()
-        where TFirstTable : SingleTableHandler<TFirstModel>, IPartInManyToMany<TFirstModel>
+        where TFirstTable : TableHandler<TFirstModel>, IPartInManyToMany<TFirstModel>
         where TSecondModel : ITableItem, IValidatable, new()
-        where TSecondTable : SingleTableHandler<TSecondModel>, IPartInManyToMany<TSecondModel>
+        where TSecondTable : TableHandler<TSecondModel>, IPartInManyToMany<TSecondModel>
     {
         /// <summary>
         /// Constructor

@@ -20,12 +20,12 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Logic
     /// <typeparam name="TManyToManyModel"></typeparam>
     /// <typeparam name="TSecondModel"></typeparam>
     /// <typeparam name="TSecondTable"></typeparam>
-    public abstract class ManyToManyHandler<TFirstModel, TFirstTable, TManyToManyModel, TSecondModel, TSecondTable> : SingleTableHandler<TManyToManyModel>
+    public abstract class ManyToManyHandler<TFirstModel, TFirstTable, TManyToManyModel, TSecondModel, TSecondTable> : TableHandler<TManyToManyModel>
         where TFirstModel : ITableItem, IValidatable, new()
-        where TFirstTable : SingleTableHandler<TFirstModel>, IPartInManyToMany<TFirstModel>
+        where TFirstTable : TableHandler<TFirstModel>, IPartInManyToMany<TFirstModel>
         where TManyToManyModel : IManyToMany, IValidatable, new()
         where TSecondModel : ITableItem, IValidatable, new()
-        where TSecondTable : SingleTableHandler<TSecondModel>, IPartInManyToMany<TSecondModel>
+        where TSecondTable : TableHandler<TSecondModel>, IPartInManyToMany<TSecondModel>
     {
         private static readonly string Namespace = typeof(ManyToManyHandler<TFirstModel, TFirstTable, TManyToManyModel, TSecondModel, TSecondTable>).Namespace;
         private readonly TFirstTable _firstTableLogic;
@@ -265,7 +265,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Logic
 
         private async Task<TModel> ReadDefaultByIdAsync<TModel, TLogic>(bool first, TLogic logic, Guid id)
             where TModel : ITableItem, IValidatable, new()
-            where TLogic : SingleTableHandler<TModel>
+            where TLogic : TableHandler<TModel>
         {
             var firstOrSecond = FirstOrSecond(first);
             var selectStatement = $"SELECT r.* FROM [{logic.TableName}] AS m2m" +
@@ -292,7 +292,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Logic
 
         private async Task<PageEnvelope<TModel, Guid>> SearchByOtherIdAsync<TModel, TLogic>(bool first, TLogic logic, Guid otherId, int offset = 0, int limit = PageInfo.DefaultLimit)
             where TModel : ITableItem, IValidatable, new()
-            where TLogic : SingleTableHandler<TModel>
+            where TLogic : TableHandler<TModel>
         {
             var firstOrSecond = FirstOrSecond(first);
             var other = FirstOrSecond(!first);
@@ -320,7 +320,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Logic
 
         private async Task<PageEnvelope<TModel, Guid>> SearchByOtherIdAndPrimaryIdAsync<TModel, TLogic>(bool first, TLogic logic, Guid otherId, int offset = 0, int limit = PageInfo.DefaultLimit)
             where TModel : ITableItem, IValidatable, new()
-            where TLogic : SingleTableHandler<TModel>, IPartInManyToMany<TModel>
+            where TLogic : TableHandler<TModel>, IPartInManyToMany<TModel>
         {
             var nameOfPrimaryIdColumn = logic.NameOfForeignKey(_typeId);
             if (nameOfPrimaryIdColumn == null) throw new FulcrumNotImplementedException(nameof(nameOfPrimaryIdColumn));

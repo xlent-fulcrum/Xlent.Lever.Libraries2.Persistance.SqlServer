@@ -7,17 +7,19 @@ using Dapper;
 using Xlent.Lever.Libraries2.Core.Assert;
 using Xlent.Lever.Libraries2.Core.Error.Logic;
 using Xlent.Lever.Libraries2.Core.Storage.Model;
+using Xlent.Lever.Libraries2.Persistance.SqlServer.Logic;
 using Xlent.Lever.Libraries2.Persistance.SqlServer.Model;
 
-namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
+namespace Xlent.Lever.Libraries2.Persistance.SqlServer
 {
     /// <summary>
     /// Helper class for advanced SELECT statmements
     /// </summary>
     /// <typeparam name="TDatabaseItem"></typeparam>
-    public partial class SingleTableHandler<TDatabaseItem> : Database
+    public partial class TableHandler<TDatabaseItem> : Database
         where TDatabaseItem : ITableItem, IValidatable, new()
     {
+        private readonly string _foreignKeyColumnName;
         protected ISqlTableMetadata TableMetadata { get; }
 
         /// <summary>
@@ -25,10 +27,22 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
         /// </summary>
         /// <param name="connectionString"></param>
         /// <param name="tableMetadata"></param>
-        public SingleTableHandler(string connectionString, ISqlTableMetadata tableMetadata)
+        public TableHandler(string connectionString, ISqlTableMetadata tableMetadata)
             : base(connectionString)
         {
             TableMetadata = tableMetadata;
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="connectionString"></param>
+        /// <param name="tableMetadata"></param>
+        /// <param name="foreignKeyColumnName"></param>
+        public TableHandler(string connectionString, ISqlTableMetadata tableMetadata, string foreignKeyColumnName)
+            : this(connectionString, tableMetadata)
+        {
+            _foreignKeyColumnName = foreignKeyColumnName;
         }
 
         /// <summary>
@@ -37,14 +51,14 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
         public string TableName => TableMetadata.TableName;
     }
 
-    public partial class SingleTableHandler<TDatabaseItem> : ICrudAll<TDatabaseItem, Guid>
-        where TDatabaseItem : ITableItem, IValidatable, new()
-    {
+    public partial class TableHandler<TDatabaseItem> : ICrudAll<TDatabaseItem, Guid>
+            where TDatabaseItem : ITableItem, IValidatable, new()
+        {
 
-        #region ICrud
+            #region ICrud
 
-        /// <inheritdoc />
-        public virtual async Task<TDatabaseItem> CreateAsync(TDatabaseItem item)
+            /// <inheritdoc />
+            public virtual async Task<TDatabaseItem> CreateAsync(TDatabaseItem item)
         {
             var id = await InternalCreateAsync(item);
             return await ReadAsync(id);
@@ -137,7 +151,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
 
         #endregion
     }
-    public partial class SingleTableHandler<TDatabaseItem> : ISearch<TDatabaseItem>
+    public partial class TableHandler<TDatabaseItem> : ISearch<TDatabaseItem>
         where TDatabaseItem : ITableItem, IValidatable, new()
     {
         #region ISearch
