@@ -51,7 +51,6 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
             return await ReadAsync(id);
         }
 
-        /// <inheritdoc />
         private async Task<Guid> InternalCreateAsync(TDatabaseItem item)
         {
             InternalContract.RequireNotNull(item, nameof(item));

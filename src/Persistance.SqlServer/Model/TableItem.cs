@@ -33,8 +33,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Model
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            var o = obj as TableItem;
-            return o != null && Id.Equals(o.Id);
+            return obj is TableItem o && Id.Equals(o.Id);
         }
 
         /// <inheritdoc />

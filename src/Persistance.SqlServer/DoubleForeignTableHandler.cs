@@ -20,7 +20,9 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
         /// <param name="connectionString"></param>
         /// <param name="tableMetadata"></param>
         /// <param name="groupColumnName1"></param>
+        /// <param name="foreignHandler1"></param>
         /// <param name="groupColumnName2"></param>
+        /// <param name="foreignHandler2"></param>
         public DoubleForeignTableHandler(string connectionString, ISqlTableMetadata tableMetadata, string groupColumnName1, SimpleTableHandler<TForeignModel1> foreignHandler1, string groupColumnName2, SimpleTableHandler<TForeignModel2> foreignHandler2)
             : base(connectionString, tableMetadata)
         {
