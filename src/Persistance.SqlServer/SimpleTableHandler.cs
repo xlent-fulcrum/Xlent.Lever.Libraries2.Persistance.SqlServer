@@ -16,10 +16,9 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
     /// Helper class for advanced SELECT statmements
     /// </summary>
     /// <typeparam name="TDatabaseItem"></typeparam>
-    public partial class TableHandler<TDatabaseItem> : Database
+    public partial class SimpleTableHandler<TDatabaseItem> : Database
         where TDatabaseItem : ITableItem, IValidatable, new()
     {
-        private readonly string _foreignKeyColumnName;
         protected ISqlTableMetadata TableMetadata { get; }
 
         /// <summary>
@@ -27,22 +26,10 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
         /// </summary>
         /// <param name="connectionString"></param>
         /// <param name="tableMetadata"></param>
-        public TableHandler(string connectionString, ISqlTableMetadata tableMetadata)
+        public SimpleTableHandler(string connectionString, ISqlTableMetadata tableMetadata)
             : base(connectionString)
         {
             TableMetadata = tableMetadata;
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="connectionString"></param>
-        /// <param name="tableMetadata"></param>
-        /// <param name="foreignKeyColumnName"></param>
-        public TableHandler(string connectionString, ISqlTableMetadata tableMetadata, string foreignKeyColumnName)
-            : this(connectionString, tableMetadata)
-        {
-            _foreignKeyColumnName = foreignKeyColumnName;
         }
 
         /// <summary>
@@ -51,7 +38,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
         public string TableName => TableMetadata.TableName;
     }
 
-    public partial class TableHandler<TDatabaseItem> : ICrudAll<TDatabaseItem, Guid>
+    public partial class SimpleTableHandler<TDatabaseItem> : ICrudAll<TDatabaseItem, Guid>
             where TDatabaseItem : ITableItem, IValidatable, new()
         {
 
@@ -88,7 +75,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
             };
             using (var db = NewSqlConnection())
             {
-                await db.ExecuteAsync(SqlHelper.Delete(TableMetadata), new {Id = id});
+                await db.ExecuteAsync(SqlHelper.DeleteBasedOnColumnValue(TableMetadata, "Id"), new {Id = id});
             }
         }
 
@@ -138,7 +125,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
         #region ICrudAll
 
         /// <inheritdoc />
-        public Task<IPageEnvelope<TDatabaseItem, Guid>> ReadAllAsync(int offset = 0, int limit = 100)
+        public Task<IPageEnvelope<TDatabaseItem, Guid>> ReadAllAsync(int offset = 0, int? limit = null)
         {
             throw new NotImplementedException();
         }
@@ -151,28 +138,29 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
 
         #endregion
     }
-    public partial class TableHandler<TDatabaseItem> : ISearch<TDatabaseItem>
+    public partial class SimpleTableHandler<TDatabaseItem> : ISearch<TDatabaseItem>
         where TDatabaseItem : ITableItem, IValidatable, new()
     {
         #region ISearch
 
         /// <inheritdoc />
         public async Task<PageEnvelope<TDatabaseItem, Guid>> SearchAllAsync(string orderBy, int offset = 0,
-            int limit = PageInfo.DefaultLimit)
+            int? limit = null)
         {
             InternalContract.RequireGreaterThanOrEqualTo(0, offset, nameof(offset));
-            InternalContract.RequireGreaterThanOrEqualTo(0, limit, nameof(limit));
+            if (limit != null) InternalContract.RequireGreaterThanOrEqualTo(0, limit.Value, nameof(limit));
             return await SearchWhereAsync(null, orderBy, null, offset, limit);
         }
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TDatabaseItem, Guid>> SearchAdvancedAsync(string countFirst, string selectFirst, string selectRest, string orderBy = null, object param = null, int offset = 0, int limit = 100)
+        public async Task<PageEnvelope<TDatabaseItem, Guid>> SearchAdvancedAsync(string countFirst, string selectFirst, string selectRest, string orderBy = null, object param = null, int offset = 0, int? limit = null)
         {
+            limit = limit ?? PageInfo.DefaultLimit;
             InternalContract.RequireGreaterThanOrEqualTo(0, offset, nameof(offset));
-            InternalContract.RequireGreaterThanOrEqualTo(0, limit, nameof(limit));
+            InternalContract.RequireGreaterThanOrEqualTo(0, limit.Value, nameof(limit));
             var total = CountItemsAdvanced(countFirst, selectRest, param);
             var selectStatement = selectRest == null ? null : $"{selectFirst} {selectRest}";
-            var data = await SearchInternalAsync(param, selectStatement, orderBy, offset, limit);
+            var data = await SearchInternalAsync(param, selectStatement, orderBy, offset, limit.Value);
             var dataAsArray = data as TDatabaseItem[] ?? data.ToArray();
             return new PageEnvelope<TDatabaseItem, Guid>
             {
@@ -181,7 +169,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
                 {
 
                     Offset = offset,
-                    Limit = limit,
+                    Limit = limit.Value,
                     Returned = dataAsArray.Length,
                     Total = total
                 }
@@ -189,12 +177,13 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
         }
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TDatabaseItem, Guid>> SearchWhereAsync(string where = null, string orderBy = null, object param = null, int offset = 0, int limit = 100)
+        public async Task<PageEnvelope<TDatabaseItem, Guid>> SearchWhereAsync(string where = null, string orderBy = null, object param = null, int offset = 0, int? limit = null)
         {
+            limit = limit ?? PageInfo.DefaultLimit;
             InternalContract.RequireGreaterThanOrEqualTo(0, offset, nameof(offset));
-            InternalContract.RequireGreaterThanOrEqualTo(0, limit, nameof(limit));
+            InternalContract.RequireGreaterThanOrEqualTo(0, limit.Value, nameof(limit));
             var total = CountItemsWhere(where, param);
-            var data = await SearchInternalWhereAsync(param, where, orderBy, offset, limit);
+            var data = await SearchInternalWhereAsync(param, where, orderBy, offset, limit.Value);
             var dataAsArray = data as TDatabaseItem[] ?? data.ToArray();
             return new PageEnvelope<TDatabaseItem, Guid>
             {
@@ -203,7 +192,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
                 {
 
                     Offset = offset,
-                    Limit = limit,
+                    Limit = limit.Value,
                     Returned = dataAsArray.Length,
                     Total = total
                 }
@@ -271,8 +260,8 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
         /// <param name="offset">The number of items that will be skipped in result.</param>
         /// <param name="limit">The maximum number of items to return.</param>
         /// <returns>The found items.</returns>
-        private async Task<IEnumerable<TDatabaseItem>> SearchInternalWhereAsync(object param, string where = null, string orderBy = null,
-            int offset = 0, int limit = PageInfo.DefaultLimit)
+        private async Task<IEnumerable<TDatabaseItem>> SearchInternalWhereAsync(object param, string where, string orderBy,
+            int offset, int limit)
         {
             InternalContract.RequireGreaterThanOrEqualTo(0, offset, nameof(offset));
             InternalContract.RequireGreaterThanOrEqualTo(0, limit, nameof(limit));
@@ -291,8 +280,8 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
         /// <param name="limit">The maximum number of items to return.</param>
         /// <returns>The found items.</returns>
         /// 
-        private async Task<IEnumerable<TDatabaseItem>> SearchInternalAsync(object param, string selectStatement, string orderBy = null,
-            int offset = 0, int limit = PageInfo.DefaultLimit)
+        private async Task<IEnumerable<TDatabaseItem>> SearchInternalAsync(object param, string selectStatement, string orderBy,
+            int offset, int limit)
         {
             InternalContract.RequireGreaterThanOrEqualTo(0, offset, nameof(offset));
             InternalContract.RequireGreaterThanOrEqualTo(0, limit, nameof(limit));

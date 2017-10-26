@@ -20,12 +20,12 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Logic
     /// <typeparam name="TManyToManyModel"></typeparam>
     /// <typeparam name="TSecondModel"></typeparam>
     /// <typeparam name="TSecondTable"></typeparam>
-    public abstract class ManyToManyHandler<TFirstModel, TFirstTable, TManyToManyModel, TSecondModel, TSecondTable> : TableHandler<TManyToManyModel>
+    public abstract class ManyToManyHandler<TFirstModel, TFirstTable, TManyToManyModel, TSecondModel, TSecondTable> : SimpleTableHandler<TManyToManyModel>
         where TFirstModel : ITableItem, IValidatable, new()
-        where TFirstTable : TableHandler<TFirstModel>, IPartInManyToMany<TFirstModel>
+        where TFirstTable : SimpleTableHandler<TFirstModel>, IPartInManyToMany<TFirstModel>
         where TManyToManyModel : IManyToMany, IValidatable, new()
         where TSecondModel : ITableItem, IValidatable, new()
-        where TSecondTable : TableHandler<TSecondModel>, IPartInManyToMany<TSecondModel>
+        where TSecondTable : SimpleTableHandler<TSecondModel>, IPartInManyToMany<TSecondModel>
     {
         private static readonly string Namespace = typeof(ManyToManyHandler<TFirstModel, TFirstTable, TManyToManyModel, TSecondModel, TSecondTable>).Namespace;
         private readonly TFirstTable _firstTableLogic;
@@ -265,7 +265,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Logic
 
         private async Task<TModel> ReadDefaultByIdAsync<TModel, TLogic>(bool first, TLogic logic, Guid id)
             where TModel : ITableItem, IValidatable, new()
-            where TLogic : TableHandler<TModel>
+            where TLogic : SimpleTableHandler<TModel>
         {
             var firstOrSecond = FirstOrSecond(first);
             var selectStatement = $"SELECT r.* FROM [{logic.TableName}] AS m2m" +
@@ -277,7 +277,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Logic
         /// <summary>
         /// Find all items with SecondId set to <paramref name="secondId"/>.
         /// </summary>
-        public async Task<PageEnvelope<TFirstModel, Guid>> SearchFirstBySecondId(Guid secondId, int offset = 0, int limit = PageInfo.DefaultLimit)
+        public async Task<PageEnvelope<TFirstModel, Guid>> SearchFirstBySecondId(Guid secondId, int offset = 0, int? limit = null)
         {
             return await SearchByOtherIdAsync<TFirstModel, TFirstTable>(true, _firstTableLogic, secondId, offset, limit);
         }
@@ -285,14 +285,14 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Logic
         /// <summary>
         /// Find all items with FirstId set to <paramref name="firstId"/>.
         /// </summary>
-        public async Task<PageEnvelope<TSecondModel, Guid>> SearchSecondByFirstId(Guid firstId, int offset = 0, int limit = PageInfo.DefaultLimit)
+        public async Task<PageEnvelope<TSecondModel, Guid>> SearchSecondByFirstId(Guid firstId, int offset = 0, int? limit = null)
         {
             return await SearchByOtherIdAsync<TSecondModel, TSecondTable>(true, _secondTableLogic, firstId, offset, limit);
         }
 
-        private async Task<PageEnvelope<TModel, Guid>> SearchByOtherIdAsync<TModel, TLogic>(bool first, TLogic logic, Guid otherId, int offset = 0, int limit = PageInfo.DefaultLimit)
+        private async Task<PageEnvelope<TModel, Guid>> SearchByOtherIdAsync<TModel, TLogic>(bool first, TLogic logic, Guid otherId, int offset = 0, int? limit = null)
             where TModel : ITableItem, IValidatable, new()
-            where TLogic : TableHandler<TModel>
+            where TLogic : SimpleTableHandler<TModel>
         {
             var firstOrSecond = FirstOrSecond(first);
             var other = FirstOrSecond(!first);
@@ -305,7 +305,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Logic
         /// <summary>
         /// Find all items in the first table by finding relations by the SecondId that has value <paramref name="secondId"/>.
         /// </summary>
-        public async Task<PageEnvelope<TFirstModel, Guid>> SearchFirstBySecondIdAndPrimaryId(Guid secondId, int offset = 0, int limit = PageInfo.DefaultLimit)
+        public async Task<PageEnvelope<TFirstModel, Guid>> SearchFirstBySecondIdAndPrimaryId(Guid secondId, int offset = 0, int? limit = null)
         {
             return await SearchByOtherIdAndPrimaryIdAsync<TFirstModel, TFirstTable>(true, _firstTableLogic, secondId, offset, limit);
         }
@@ -313,14 +313,14 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Logic
         /// <summary>
         /// Find all items in the second table by finding relations by the FirstId that has value <paramref name="firstId"/>.
         /// </summary>
-        public async Task<PageEnvelope<TSecondModel, Guid>> SearchSecondByFirstIdAndPrimaryId(Guid firstId, int offset = 0, int limit = PageInfo.DefaultLimit)
+        public async Task<PageEnvelope<TSecondModel, Guid>> SearchSecondByFirstIdAndPrimaryId(Guid firstId, int offset = 0, int? limit = null)
         {
             return await SearchByOtherIdAsync<TSecondModel, TSecondTable>(true, _secondTableLogic, firstId, offset, limit);
         }
 
-        private async Task<PageEnvelope<TModel, Guid>> SearchByOtherIdAndPrimaryIdAsync<TModel, TLogic>(bool first, TLogic logic, Guid otherId, int offset = 0, int limit = PageInfo.DefaultLimit)
+        private async Task<PageEnvelope<TModel, Guid>> SearchByOtherIdAndPrimaryIdAsync<TModel, TLogic>(bool first, TLogic logic, Guid otherId, int offset = 0, int? limit = null)
             where TModel : ITableItem, IValidatable, new()
-            where TLogic : TableHandler<TModel>, IPartInManyToMany<TModel>
+            where TLogic : SimpleTableHandler<TModel>, IPartInManyToMany<TModel>
         {
             var nameOfPrimaryIdColumn = logic.NameOfForeignKey(_typeId);
             if (nameOfPrimaryIdColumn == null) throw new FulcrumNotImplementedException(nameof(nameOfPrimaryIdColumn));
@@ -335,7 +335,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Logic
         /// <summary>
         /// Find all relations that has FirstId set to <paramref name="firstId"/>.
         /// </summary>
-        protected async Task<PageEnvelope<TManyToManyModel, Guid>> SearchByFirstId(Guid firstId, int offset = 0, int limit = PageInfo.DefaultLimit)
+        protected async Task<PageEnvelope<TManyToManyModel, Guid>> SearchByFirstId(Guid firstId, int offset = 0, int? limit = null)
         {
             return await SearchWhereAsync("[FirstId]=@FirstId AND [TypeId]=@TypeId", "m2m.[FirstSortOrder]", new { FirstId = firstId, TypeId = _typeId }, offset, limit);
         }
@@ -344,7 +344,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Logic
         /// <summary>
         /// Find all relations that has SecondId set to <paramref name="secondId"/>.
         /// </summary>
-        protected async Task<PageEnvelope<TManyToManyModel, Guid>> SearchBySecondId(Guid secondId, int offset = 0, int limit = PageInfo.DefaultLimit)
+        protected async Task<PageEnvelope<TManyToManyModel, Guid>> SearchBySecondId(Guid secondId, int offset = 0, int? limit = null)
         {
             return await SearchWhereAsync("[SecondId]=@SecondId AND [TypeId]=@TypeId", "m2m.[SecondSortOrder]", new { SecondId = secondId, TypeId = _typeId }, offset, limit);
         }

@@ -16,7 +16,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
 
         public static string Update(ISqlTableMetadata tableMetadata, string oldEtag) => $"UPDATE [{tableMetadata.TableName}] SET {UpdateList(tableMetadata)} WHERE Id = @Id AND ETag == '{oldEtag}'";
 
-        public static string Delete(ISqlTableMetadata tableMetadata) => $"DELETE FROM [{tableMetadata.TableName}] WHERE Id = @Id";
+        public static string DeleteBasedOnColumnValue(ISqlTableMetadata tableMetadata, string columnName, string variableName = null) => $"DELETE FROM [{tableMetadata.TableName}] WHERE {columnName} = @{variableName ?? columnName}";
 
         public static string ColumnList(ISqlTableMetadata item) => string.Join(", ", AllColumnNames(item).Select(name => $"[{name}]"));
 

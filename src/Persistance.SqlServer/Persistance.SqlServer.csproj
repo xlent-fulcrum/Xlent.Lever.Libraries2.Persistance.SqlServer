@@ -42,14 +42,15 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="Xlent.Lever.Libraries2.Core.NetFramework, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xlent.Lever.Libraries2.Core.NetFramework.1.9.5\lib\net46\Xlent.Lever.Libraries2.Core.NetFramework.dll</HintPath>
+      <HintPath>..\..\packages\Xlent.Lever.Libraries2.Core.NetFramework.1.10.0\lib\net46\Xlent.Lever.Libraries2.Core.NetFramework.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ManyToOneTableHandler.cs" />
     <Compile Include="Logic\Database.cs" />
     <Compile Include="Logic\SqlHelper.cs" />
     <Compile Include="Logic\ISearch.cs" />
-    <Compile Include="TableHandler.cs" />
+    <Compile Include="SimpleTableHandler.cs" />
     <Compile Include="Model\ISqlTableMetadata.cs" />
     <Compile Include="Model\ITableItem.cs" />
     <Compile Include="Model\TableItem.cs" />
