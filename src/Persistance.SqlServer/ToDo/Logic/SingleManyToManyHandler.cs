@@ -1,6 +1,5 @@
 ﻿using System;
 using Xlent.Lever.Libraries2.Core.Assert;
-using Xlent.Lever.Libraries2.Persistance.SqlServer.Logic;
 using Xlent.Lever.Libraries2.Persistance.SqlServer.Model;
 using Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Interfaces;
 using Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Models;

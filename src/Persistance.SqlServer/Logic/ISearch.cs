@@ -10,7 +10,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
     /// </summary>
     /// <typeparam name="TDatabaseItem"></typeparam>
     public interface ISearch<TDatabaseItem>
-        where TDatabaseItem : ITableItem, new()
+        where TDatabaseItem : ITableItem
     {
         /// <summary>
         /// Fetches all rows for the current table.

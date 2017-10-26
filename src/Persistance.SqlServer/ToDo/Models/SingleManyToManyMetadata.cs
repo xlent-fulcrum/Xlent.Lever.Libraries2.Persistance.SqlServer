@@ -1,6 +1,4 @@
-﻿using Xlent.Lever.Libraries2.Core.Assert;
-
-namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Models
+﻿namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Models
 {
     /// <summary>
     /// One table to keep all ManyToMany relations

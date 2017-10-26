@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Xlent.Lever.Libraries2.Core.Assert;
+﻿using System.Collections.Generic;
 using Xlent.Lever.Libraries2.Persistance.SqlServer.Model;
-using Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Interfaces;
 
 namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Models
 {
@@ -16,6 +13,6 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.ToDo.Models
         /// <inheritdoc />
         public virtual IEnumerable<string> CustomColumnNames => new[] { "TypeId", "FirstId", "SecondId", "FirstSortOrder", "SecondSortOrder" };
         /// <inheritdoc />
-        public virtual string OrderBy => "FirstId, FirstSortOrder";
+        public virtual string OrderBy(string columnPrefix = null) => $"{columnPrefix??""}FirstId, {columnPrefix ?? ""}FirstSortOrder";
     }
 }

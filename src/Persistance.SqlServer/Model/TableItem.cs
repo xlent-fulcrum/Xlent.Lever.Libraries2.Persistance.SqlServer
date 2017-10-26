@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Xlent.Lever.Libraries2.Core.Assert;
 
 namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Model

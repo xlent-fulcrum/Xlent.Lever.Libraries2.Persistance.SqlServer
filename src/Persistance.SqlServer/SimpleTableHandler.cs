@@ -17,7 +17,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
     /// </summary>
     /// <typeparam name="TDatabaseItem"></typeparam>
     public partial class SimpleTableHandler<TDatabaseItem> : Database
-        where TDatabaseItem : ITableItem, IValidatable, new()
+        where TDatabaseItem : ITableItem, IValidatable
     {
         protected ISqlTableMetadata TableMetadata { get; }
 
@@ -39,7 +39,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
     }
 
     public partial class SimpleTableHandler<TDatabaseItem> : ICrudAll<TDatabaseItem, Guid>
-            where TDatabaseItem : ITableItem, IValidatable, new()
+            where TDatabaseItem : ITableItem, IValidatable
         {
 
             #region ICrud
@@ -69,10 +69,6 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
         public async Task DeleteAsync(Guid id)
         {
             InternalContract.RequireNotDefaultValue(id, nameof(id));
-            var item = new TDatabaseItem
-            {
-                Id = id
-            };
             using (var db = NewSqlConnection())
             {
                 await db.ExecuteAsync(SqlHelper.DeleteBasedOnColumnValue(TableMetadata, "Id"), new {Id = id});
@@ -83,11 +79,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
         public async Task<TDatabaseItem> ReadAsync(Guid id)
         {
             InternalContract.RequireNotDefaultValue(id, nameof(id));
-            var item = new TDatabaseItem
-            {
-                Id = id
-            };
-            return await SearchWhereSingle("Id = @Id", item);
+            return await SearchWhereSingle("Id = @Id", new { Id = id });
         }
 
         /// <inheritdoc />
@@ -125,7 +117,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
         #region ICrudAll
 
         /// <inheritdoc />
-        public Task<IPageEnvelope<TDatabaseItem, Guid>> ReadAllAsync(int offset = 0, int? limit = null)
+        public Task<PageEnvelope<TDatabaseItem, Guid>> ReadAllAsync(int offset = 0, int? limit = null)
         {
             throw new NotImplementedException();
         }
@@ -139,7 +131,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
         #endregion
     }
     public partial class SimpleTableHandler<TDatabaseItem> : ISearch<TDatabaseItem>
-        where TDatabaseItem : ITableItem, IValidatable, new()
+        where TDatabaseItem : ITableItem, IValidatable
     {
         #region ISearch
 
@@ -203,7 +195,6 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
         public async Task<TDatabaseItem> SearchWhereSingle(string where, object param = null)
         {
             if (where == null) where = "1=1";
-            var item = new TDatabaseItem();
             return await SearchAdvancedSingleAsync($"SELECT * FROM [{TableMetadata.TableName}] WHERE ({where})", param);
         }
 
@@ -232,8 +223,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
         /// <inheritdoc />
         public int CountItemsWhere(string where = null, object param = null)
         {
-            if (where == null) where = "1=1";
-            var item = new TDatabaseItem();
+            where = where ?? "1=1";
             return CountItemsAdvanced("SELECT COUNT(*)", $"FROM [{TableMetadata.TableName}] WHERE ({where})", param);
         }
 
@@ -265,8 +255,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
         {
             InternalContract.RequireGreaterThanOrEqualTo(0, offset, nameof(offset));
             InternalContract.RequireGreaterThanOrEqualTo(0, limit, nameof(limit));
-            if (where == null) where = "1=1";
-            var item = new TDatabaseItem();
+            where = where ?? "1=1";
             return await SearchInternalAsync(param, $"SELECT * FROM [{TableMetadata.TableName}] WHERE ({where})", orderBy, offset, limit);
         }
 
@@ -286,7 +275,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
             InternalContract.RequireGreaterThanOrEqualTo(0, offset, nameof(offset));
             InternalContract.RequireGreaterThanOrEqualTo(0, limit, nameof(limit));
             InternalContract.RequireNotNullOrWhitespace(selectStatement, nameof(selectStatement));
-            if (orderBy == null) orderBy = "1";
+            orderBy = orderBy ?? TableMetadata.OrderBy() ?? "1";
             using (IDbConnection db = NewSqlConnection())
             {
                 var sqlQuery = $"{selectStatement} " +

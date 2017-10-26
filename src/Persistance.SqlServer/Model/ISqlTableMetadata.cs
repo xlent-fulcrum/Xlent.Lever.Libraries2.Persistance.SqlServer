@@ -22,6 +22,6 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Model
         /// <summary>
         /// Will be used as "ORDER BY {OrderBy}" when selecting multiple rows from the table.
         /// </summary>
-        string OrderBy { get; }
+        string OrderBy(string columnPrefix = null);
     }
 }
