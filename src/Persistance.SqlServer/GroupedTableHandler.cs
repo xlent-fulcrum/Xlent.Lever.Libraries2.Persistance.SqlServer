@@ -32,7 +32,7 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
 
         public async Task<PageEnvelope<TDatabaseItem, Guid>> ReadAllAsync(TGroupColumn groupValue, int offset = 0, int? limit = null)
         {
-            return await SearchWhereAsync($"{GroupColumnName} = @GroupValue", TableMetadata.OrderBy, new {GroupValue = groupValue}, offset, limit);
+            return await SearchWhereAsync($"{GroupColumnName} = @GroupValue", TableMetadata.OrderBy(), new {GroupValue = groupValue}, offset, limit);
         }
 
         public async Task DeleteAllAsync(TGroupColumn groupValue)

@@ -30,50 +30,49 @@ namespace Xlent.Lever.Libraries2.Persistance.SqlServer
 
         #region READ
         /// <summary>
-        /// Get the item that has the specified <paramref name="foreignKey1"/> and <paramref name="foreignKey2"/>.
+        /// Get the item that has the specified <paramref name="foreignKey1Value"/> and <paramref name="foreignKey2Value"/>.
         /// </summary>
-        public async Task<TDatabaseItem> Read(Guid foreignKey1, Guid foreignKey2)
+        public async Task<TDatabaseItem> Read(Guid foreignKey1Value, Guid foreignKey2Value)
         {
-            var param = new { ForeignKey1 = foreignKey1, ForeignKey2 = foreignKey2};
-            return await SearchWhereSingle($"{ForeignKeyTableHandler1.GroupColumnName} = @ForeignKey1 AND {ForeignKeyTableHandler2.GroupColumnName}= @ForeignKey2", param);
+            var param = new { ForeignKey1Value = foreignKey1Value, ForeignKey2Value = foreignKey2Value};
+            return await SearchWhereSingle($"{ForeignKeyTableHandler1.GroupColumnName} = @ForeignKey1Value AND {ForeignKeyTableHandler2.GroupColumnName}= @ForeignKey2Value", param);
         }
 
         /// <summary>
-        /// Find all items that has foreign key 1 set to <paramref name="foreignKey1"/>.
+        /// Find all items that has foreign key 1 set to <paramref name="foreignKey1Value"/>.
         /// </summary>
-        public async Task<PageEnvelope<TDatabaseItem, Guid>> ReadByForeignKey1(Guid foreignKey1, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TDatabaseItem, Guid>> ReadByForeignKey1(Guid foreignKey1Value, int offset = 0, int? limit = null)
         {
-            var param = new { ForeignKey1 = foreignKey1 };
-            return await SearchWhereAsync($"{ForeignKeyTableHandler1.GroupColumnName} = @ForeignKey1", null, param, offset, limit);
+            var param = new { ForeignKey1Value = foreignKey1Value };
+            return await SearchWhereAsync($"{ForeignKeyTableHandler1.GroupColumnName} = @ForeignKey1Value", null, param, offset, limit);
         }
 
         /// <summary>
-        /// Find all items that has foreign key 2 set to <paramref name="foreignKey2"/>.
+        /// Find all items that has foreign key 2 set to <paramref name="foreignKey2Value"/>.
         /// </summary>
-        public async Task<PageEnvelope<TDatabaseItem, Guid>> ReadByForeignKey2(Guid foreignKey2, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TDatabaseItem, Guid>> ReadByForeignKey2(Guid foreignKey2Value, int offset = 0, int? limit = null)
         {
-            var param = new { ForeignKey2 = foreignKey2 };
-            return await SearchWhereAsync($"{ForeignKeyTableHandler2.GroupColumnName} = @ForeignKey2", null, param, offset, limit);
+            var param = new { ForeignKey2Value = foreignKey2Value };
+            return await SearchWhereAsync($"{ForeignKeyTableHandler2.GroupColumnName} = @ForeignKey2Value", null, param, offset, limit);
         }
         #endregion
 
 
         #region SEARCH
-
         /// <summary>
-        /// Find all items with foreign key 1 set to <paramref name="foreignKey1"/>.
+        /// Find all items with foreign key 1 set to <paramref name="foreignKey1Value"/>.
         /// </summary>
-        public async Task<PageEnvelope<TForeignModel2, Guid>> SearchByForeignKey1(Guid foreignKey1, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TForeignModel2, Guid>> SearchByForeignKey1(Guid foreignKey1Value, int offset = 0, int? limit = null)
         {
-            return await ForeignKeyTableHandler2.ReadForeignAsync(foreignKey1, offset, limit);
+            return await ForeignKeyTableHandler2.ReadForeignAsync(foreignKey1Value, offset, limit);
         }
 
         /// <summary>
-        /// Find all items with foreign key 2 set to <paramref name="foreignKey2"/>.
+        /// Find all items with foreign key 2 set to <paramref name="foreignKey2Value"/>.
         /// </summary>
-        public async Task<PageEnvelope<TForeignModel1, Guid>> SearchByForeignKey2(Guid foreignKey2, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TForeignModel1, Guid>> SearchByForeignKey2(Guid foreignKey2Value, int offset = 0, int? limit = null)
         {
-            return await ForeignKeyTableHandler1.ReadForeignAsync(foreignKey2, offset, limit);
+            return await ForeignKeyTableHandler1.ReadForeignAsync(foreignKey2Value, offset, limit);
         }
         #endregion
     }
