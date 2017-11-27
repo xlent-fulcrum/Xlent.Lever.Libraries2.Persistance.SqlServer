@@ -7,10 +7,10 @@ using Dapper;
 using Xlent.Lever.Libraries2.Core.Assert;
 using Xlent.Lever.Libraries2.Core.Error.Logic;
 using Xlent.Lever.Libraries2.Core.Storage.Model;
-using Xlent.Lever.Libraries2.Persistance.SqlServer.Logic;
-using Xlent.Lever.Libraries2.Persistance.SqlServer.Model;
+using Xlent.Lever.Libraries2.SqlServer.Logic;
+using Xlent.Lever.Libraries2.SqlServer.Model;
 
-namespace Xlent.Lever.Libraries2.Persistance.SqlServer
+namespace Xlent.Lever.Libraries2.SqlServer
 {
     /// <summary>
     /// Helper class for advanced SELECT statmements

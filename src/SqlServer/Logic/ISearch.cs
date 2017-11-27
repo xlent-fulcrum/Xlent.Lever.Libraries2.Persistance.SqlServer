@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Xlent.Lever.Libraries2.Core.Storage.Model;
-using Xlent.Lever.Libraries2.Persistance.SqlServer.Model;
+using Xlent.Lever.Libraries2.SqlServer.Model;
 
-namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
+namespace Xlent.Lever.Libraries2.SqlServer.Logic
 {
     /// <summary>
     /// Methods for searching (SELECT ... FROM ... WHERE ... GROUP BY) in an SQL database

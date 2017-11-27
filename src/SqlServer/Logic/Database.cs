@@ -1,6 +1,6 @@
 ﻿using System.Data.SqlClient;
 
-namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
+namespace Xlent.Lever.Libraries2.SqlServer.Logic
 {
     /// <summary>
     /// Base class for common Database knowledge

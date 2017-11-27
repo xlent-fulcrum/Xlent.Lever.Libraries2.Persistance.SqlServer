@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 using Dapper;
 using Xlent.Lever.Libraries2.Core.Assert;
 using Xlent.Lever.Libraries2.Core.Storage.Model;
-using Xlent.Lever.Libraries2.Persistance.SqlServer.Logic;
-using Xlent.Lever.Libraries2.Persistance.SqlServer.Model;
+using Xlent.Lever.Libraries2.SqlServer.Logic;
+using Xlent.Lever.Libraries2.SqlServer.Model;
 
-namespace Xlent.Lever.Libraries2.Persistance.SqlServer
+namespace Xlent.Lever.Libraries2.SqlServer
 {
     public class GroupedTableHandler<TDatabaseItem, TGroupColumn> : SimpleTableHandler<TDatabaseItem>, IGrouped<TDatabaseItem, Guid, TGroupColumn>
         where TDatabaseItem : ITableItem, IValidatable

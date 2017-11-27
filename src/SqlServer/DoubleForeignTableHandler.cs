@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using Xlent.Lever.Libraries2.Core.Assert;
 using Xlent.Lever.Libraries2.Core.Storage.Model;
-using Xlent.Lever.Libraries2.Persistance.SqlServer.Model;
+using Xlent.Lever.Libraries2.SqlServer.Model;
 
-namespace Xlent.Lever.Libraries2.Persistance.SqlServer
+namespace Xlent.Lever.Libraries2.SqlServer
 {
     public class DoubleForeignTableHandler<TDatabaseItem, TForeignModel1, TForeignModel2> : SimpleTableHandler<TDatabaseItem>
         where TDatabaseItem : ITableItem, IValidatable

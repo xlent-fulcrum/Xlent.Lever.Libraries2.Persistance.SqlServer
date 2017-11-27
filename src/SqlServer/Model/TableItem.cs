@@ -1,7 +1,7 @@
 ﻿using System;
 using Xlent.Lever.Libraries2.Core.Assert;
 
-namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Model
+namespace Xlent.Lever.Libraries2.SqlServer.Model
 {
     /// <summary>
     /// A base class that has the mandatory properties.

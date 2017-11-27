@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Xlent.Lever.Libraries2.Core.Storage.Model;
-using Xlent.Lever.Libraries2.Persistance.SqlServer.Model;
+using Xlent.Lever.Libraries2.SqlServer.Model;
 
-namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Logic
+namespace Xlent.Lever.Libraries2.SqlServer.Logic
 {
     internal static class SqlHelper
     {

@@ -2,7 +2,7 @@
 using Xlent.Lever.Libraries2.Core.Assert;
 using Xlent.Lever.Libraries2.Core.Storage.Model;
 
-namespace Xlent.Lever.Libraries2.Persistance.SqlServer.Model
+namespace Xlent.Lever.Libraries2.SqlServer.Model
 {
     /// <summary>
     /// Inhertis from <see cref="TableItem"/> and adds time stamp columns.

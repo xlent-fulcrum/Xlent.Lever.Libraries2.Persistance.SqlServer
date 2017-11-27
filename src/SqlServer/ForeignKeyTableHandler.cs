@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using Xlent.Lever.Libraries2.Core.Assert;
 using Xlent.Lever.Libraries2.Core.Storage.Model;
-using Xlent.Lever.Libraries2.Persistance.SqlServer.Model;
+using Xlent.Lever.Libraries2.SqlServer.Model;
 
-namespace Xlent.Lever.Libraries2.Persistance.SqlServer
+namespace Xlent.Lever.Libraries2.SqlServer
 {
     public class ForeignKeyTableHandler<TLocalItem, TForeignItem> : GroupedTableHandler<TLocalItem, Guid>
         where TLocalItem : ITableItem, IValidatable
