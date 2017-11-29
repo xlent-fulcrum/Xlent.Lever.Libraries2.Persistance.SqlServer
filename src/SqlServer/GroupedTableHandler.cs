@@ -8,7 +8,7 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer
 {
-    public class GroupedTableHandler<TDatabaseItem, TGroupColumn> : SimpleTableHandler<TDatabaseItem>, IGrouped<TDatabaseItem, Guid, TGroupColumn>
+    public class GroupedTableHandler<TDatabaseItem, TGroupColumn> : SimpleTableHandler<TDatabaseItem>, IGrouped<TDatabaseItem, TGroupColumn>
         where TDatabaseItem : ITableItem, IValidatable
     {
         public string GroupColumnName { get; }
@@ -30,7 +30,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
             return await CreateAsync(item);
         }
 
-        public async Task<PageEnvelope<TDatabaseItem, Guid>> ReadAllAsync(TGroupColumn groupValue, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TDatabaseItem>> ReadAllAsync(TGroupColumn groupValue, int offset = 0, int? limit = null)
         {
             return await SearchWhereAsync($"{GroupColumnName} = @GroupValue", TableMetadata.OrderBy(), new {GroupValue = groupValue}, offset, limit);
         }

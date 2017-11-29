@@ -116,7 +116,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         #region ICrudAll
 
         /// <inheritdoc />
-        public Task<PageEnvelope<TDatabaseItem, Guid>> ReadAllAsync(int offset = 0, int? limit = null)
+        public Task<PageEnvelope<TDatabaseItem>> ReadAllAsync(int offset = 0, int? limit = null)
         {
             throw new NotImplementedException();
         }
@@ -135,7 +135,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         #region ISearch
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TDatabaseItem, Guid>> SearchAllAsync(string orderBy, int offset = 0,
+        public async Task<PageEnvelope<TDatabaseItem>> SearchAllAsync(string orderBy, int offset = 0,
             int? limit = null)
         {
             InternalContract.RequireGreaterThanOrEqualTo(0, offset, nameof(offset));
@@ -144,7 +144,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         }
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TDatabaseItem, Guid>> SearchAdvancedAsync(string countFirst, string selectFirst, string selectRest, string orderBy = null, object param = null, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TDatabaseItem>> SearchAdvancedAsync(string countFirst, string selectFirst, string selectRest, string orderBy = null, object param = null, int offset = 0, int? limit = null)
         {
             limit = limit ?? PageInfo.DefaultLimit;
             InternalContract.RequireGreaterThanOrEqualTo(0, offset, nameof(offset));
@@ -153,7 +153,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
             var selectStatement = selectRest == null ? null : $"{selectFirst} {selectRest}";
             var data = await SearchInternalAsync(param, selectStatement, orderBy, offset, limit.Value);
             var dataAsArray = data as TDatabaseItem[] ?? data.ToArray();
-            return new PageEnvelope<TDatabaseItem, Guid>
+            return new PageEnvelope<TDatabaseItem>
             {
                 Data = dataAsArray,
                 PageInfo = new PageInfo
@@ -168,7 +168,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         }
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TDatabaseItem, Guid>> SearchWhereAsync(string where = null, string orderBy = null, object param = null, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TDatabaseItem>> SearchWhereAsync(string where = null, string orderBy = null, object param = null, int offset = 0, int? limit = null)
         {
             limit = limit ?? PageInfo.DefaultLimit;
             InternalContract.RequireGreaterThanOrEqualTo(0, offset, nameof(offset));
@@ -176,7 +176,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
             var total = CountItemsWhere(where, param);
             var data = await SearchInternalWhereAsync(param, where, orderBy, offset, limit.Value);
             var dataAsArray = data as TDatabaseItem[] ?? data.ToArray();
-            return new PageEnvelope<TDatabaseItem, Guid>
+            return new PageEnvelope<TDatabaseItem>
             {
                 Data = dataAsArray,
                 PageInfo = new PageInfo

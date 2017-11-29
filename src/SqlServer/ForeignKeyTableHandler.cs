@@ -25,7 +25,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
             ForeignHandler = foreignHandler;
         }
 
-        public async Task<PageEnvelope<TForeignItem, Guid>> ReadForeignAsync(Guid groupValue, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TForeignItem>> ReadForeignAsync(Guid groupValue, int offset = 0, int? limit = null)
         {
             var selectRest = $"FROM [{TableMetadata.TableName}] AS local" +
                              $" JOIN [{ForeignHandler.TableName}] AS foregin ON (foreign.Id = local.{GroupColumnName})" +
