@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Xlent.Lever.Libraries2.Core.Assert;
 using Xlent.Lever.Libraries2.Core.Error.Logic;
+using Xlent.Lever.Libraries2.Core.Storage.Logic;
 using Xlent.Lever.Libraries2.Core.Storage.Model;
 using Xlent.Lever.Libraries2.SqlServer.Logic;
 using Xlent.Lever.Libraries2.SqlServer.Model;
@@ -16,10 +17,11 @@ namespace Xlent.Lever.Libraries2.SqlServer
     /// Helper class for advanced SELECT statmements
     /// </summary>
     /// <typeparam name="TDatabaseItem"></typeparam>
-    public partial class SimpleTableHandler<TDatabaseItem> : Database
+    public partial class SimpleTableHandler<TDatabaseItem> : CrudBase<TDatabaseItem, Guid>
         where TDatabaseItem : ITableItem, IValidatable
     {
-        protected ISqlTableMetadata TableMetadata { get; }
+        public Database Database { get; }
+        public ISqlTableMetadata TableMetadata { get; }
 
         /// <summary>
         /// Constructor
@@ -27,8 +29,8 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <param name="connectionString"></param>
         /// <param name="tableMetadata"></param>
         public SimpleTableHandler(string connectionString, ISqlTableMetadata tableMetadata)
-            : base(connectionString)
         {
+            Database = new Database(connectionString);
             TableMetadata = tableMetadata;
         }
 
@@ -38,59 +40,51 @@ namespace Xlent.Lever.Libraries2.SqlServer
         public string TableName => TableMetadata.TableName;
     }
 
-    public partial class SimpleTableHandler<TDatabaseItem> : ICrudAll<TDatabaseItem, Guid>
+    public partial class SimpleTableHandler<TDatabaseItem> : CrudBase<TDatabaseItem, Guid>
             where TDatabaseItem : ITableItem, IValidatable
-        {
-
-            #region ICrud
-
-            /// <inheritdoc />
-            public virtual async Task<TDatabaseItem> CreateAsync(TDatabaseItem item)
-        {
-            var id = await InternalCreateAsync(item);
-            return await ReadAsync(id);
-        }
-
-        private async Task<Guid> InternalCreateAsync(TDatabaseItem item)
+    {
+        /// <inheritdoc />
+        public override async Task CreateWithSpecifiedIdAsync(Guid id, TDatabaseItem item)
         {
             InternalContract.RequireNotNull(item, nameof(item));
-            if (item.Id == Guid.Empty) item.Id = Guid.NewGuid();
-            item.ETag = Guid.NewGuid().ToString();
+            MaybeCreateNewEtag(item);
             InternalContract.RequireValidated(item, nameof(item));
-            using (var db = NewSqlConnection())
+            using (var db = Database.NewSqlConnection())
             {
                 await db.ExecuteAsync(SqlHelper.Create(TableMetadata), item);
             }
-            return item.Id;
         }
 
         /// <inheritdoc />
-        public async Task DeleteAsync(Guid id)
+        public override async Task DeleteAsync(Guid id)
         {
             InternalContract.RequireNotDefaultValue(id, nameof(id));
-            using (var db = NewSqlConnection())
+            using (var db = Database.NewSqlConnection())
             {
-                await db.ExecuteAsync(SqlHelper.DeleteBasedOnColumnValue(TableMetadata, "Id"), new {Id = id});
+                await db.ExecuteAsync(SqlHelper.DeleteBasedOnColumnValue(TableMetadata, "Id"), new { Id = id });
             }
         }
 
+        public override async Task<PageEnvelope<TDatabaseItem>> ReadAllAsync(int offset = 0, int? limit = null)
+        {
+            return await SearchAllAsync(null, offset, limit);
+        }
+
         /// <inheritdoc />
-        public async Task<TDatabaseItem> ReadAsync(Guid id)
+        public override async Task<TDatabaseItem> ReadAsync(Guid id)
         {
             InternalContract.RequireNotDefaultValue(id, nameof(id));
             return await SearchWhereSingle("Id = @Id", new { Id = id });
         }
 
         /// <inheritdoc />
-        public async Task<TDatabaseItem> UpdateAsync(TDatabaseItem item)
+        public override async Task UpdateAsync(Guid id, TDatabaseItem item)
         {
             InternalContract.RequireNotNull(item, nameof(item));
             InternalContract.RequireValidated(item, nameof(item));
             await InternalUpdateAsync(item);
-            return await ReadAsync(item.Id);
         }
 
-        /// <inheritdoc />
         private async Task InternalUpdateAsync(TDatabaseItem item)
         {
             InternalContract.RequireNotNull(item, nameof(item));
@@ -98,38 +92,20 @@ namespace Xlent.Lever.Libraries2.SqlServer
             var oldItem = await ReadAsync(item.Id);
             if (oldItem == null)
                 throw new FulcrumNotFoundException($"Table {TableMetadata.TableName} did not contain an item with id {item.Id}");
-            if (!string.Equals(oldItem.ETag, item.ETag))
+            if (!string.Equals(oldItem.Etag, item.Etag))
                 throw new FulcrumConflictException(
                     "Could not update. Your data was stale. Please reload and try again.");
-            item.ETag = Guid.NewGuid().ToString();
-            using (var db = NewSqlConnection())
+            item.Etag = Guid.NewGuid().ToString();
+            using (var db = Database.NewSqlConnection())
             {
-                var count = await db.ExecuteAsync(SqlHelper.Update(TableMetadata, oldItem.ETag), item);
+                var count = await db.ExecuteAsync(SqlHelper.Update(TableMetadata, oldItem.Etag), item);
                 if (count == 0)
                     throw new FulcrumConflictException(
                         "Could not update. Your data was stale. Please reload and try again.");
             }
         }
-
-        #endregion
-
-        #region ICrudAll
-
-        /// <inheritdoc />
-        public Task<PageEnvelope<TDatabaseItem>> ReadAllAsync(int offset = 0, int? limit = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc />
-        public Task DeleteAllAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
     }
-    public partial class SimpleTableHandler<TDatabaseItem> : ISearch<TDatabaseItem>
+    public partial class SimpleTableHandler<TDatabaseItem> : CrudBase<TDatabaseItem, Guid>, ISearch<TDatabaseItem>
         where TDatabaseItem : ITableItem, IValidatable
     {
         #region ISearch
@@ -233,7 +209,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
             InternalContract.RequireNotNullOrWhitespace(selectRest, nameof(selectRest));
             if (selectRest == null) return 0;
             var selectStatement = $"{selectFirst} {selectRest}";
-            using (IDbConnection db = NewSqlConnection())
+            using (IDbConnection db = Database.NewSqlConnection())
             {
                 return db.Query<int>(selectStatement, param)
                     .SingleOrDefault();
@@ -275,13 +251,13 @@ namespace Xlent.Lever.Libraries2.SqlServer
             InternalContract.RequireGreaterThanOrEqualTo(0, limit, nameof(limit));
             InternalContract.RequireNotNullOrWhitespace(selectStatement, nameof(selectStatement));
             orderBy = orderBy ?? TableMetadata.OrderBy() ?? "1";
-            using (IDbConnection db = NewSqlConnection())
+            using (IDbConnection db = Database.NewSqlConnection())
             {
                 var sqlQuery = $"{selectStatement} " +
                                $" ORDER BY {orderBy}" +
                                $" OFFSET {offset} ROWS FETCH NEXT {limit} ROWS ONLY";
 
-               return await db.QueryAsync<TDatabaseItem>(sqlQuery, param);
+                return await db.QueryAsync<TDatabaseItem>(sqlQuery, param);
             }
         }
         #endregion

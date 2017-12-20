@@ -11,18 +11,18 @@ namespace Xlent.Lever.Libraries2.SqlServer.Model
     public abstract class TimeStampedTableItem : TableItem, ITimeStamped
     {
         /// <inheritdoc />
-        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset RecordCreatedAt { get; set; }
 
         /// <inheritdoc />
-        public DateTimeOffset UpdatedAt { get; set; }
+        public DateTimeOffset RecordUpdatedAt { get; set; }
 
         /// <inheritdoc />
         public override void Validate(string errorLocaction, string propertyPath = "")
         {
             base.Validate(errorLocaction, propertyPath);
             var now = DateTimeOffset.Now;
-            FulcrumValidate.IsTrue(CreatedAt < now, errorLocaction, $"Expected {nameof(CreatedAt)} ({CreatedAt}) to have a value less than the current time ({now}).");
-            FulcrumValidate.IsTrue(UpdatedAt < now, errorLocaction, $"Expected {nameof(UpdatedAt)} ({UpdatedAt}) to have a value less than the current time ({now}).");
+            FulcrumValidate.IsTrue(RecordCreatedAt < now, errorLocaction, $"Expected {nameof(RecordCreatedAt)} ({RecordCreatedAt}) to have a value less than the current time ({now}).");
+            FulcrumValidate.IsTrue(RecordUpdatedAt < now, errorLocaction, $"Expected {nameof(RecordUpdatedAt)} ({RecordUpdatedAt}) to have a value less than the current time ({now}).");
         }
     }
 }

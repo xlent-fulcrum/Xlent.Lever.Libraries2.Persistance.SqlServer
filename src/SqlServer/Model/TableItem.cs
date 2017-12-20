@@ -15,13 +15,13 @@ namespace Xlent.Lever.Libraries2.SqlServer.Model
         public Guid Id { get; set; }
 
         /// <inheritdoc />
-        public string ETag { get; set; }
+        public string Etag { get; set; }
 
         /// <inheritdoc />
         public virtual void Validate(string errorLocaction, string propertyPath = "")
         {
             FulcrumValidate.IsNotDefaultValue(Id, nameof(Id), errorLocaction);
-            FulcrumValidate.IsNotNullOrWhiteSpace(ETag, nameof(ETag), errorLocaction);
+            FulcrumValidate.IsNotNullOrWhiteSpace(Etag, nameof(Etag), errorLocaction);
         }
 
         /// <inheritdoc />

@@ -5,7 +5,7 @@ namespace Xlent.Lever.Libraries2.SqlServer.Logic
     /// <summary>
     /// Base class for common Database knowledge
     /// </summary>
-    public abstract class Database
+    public class Database
     {
         private readonly string _connectionString;
 
@@ -13,7 +13,7 @@ namespace Xlent.Lever.Libraries2.SqlServer.Logic
         /// The constructor
         /// </summary>
         /// <param name="connectionString">How to connect to the database.</param>
-        protected Database(string connectionString)
+        public Database(string connectionString)
         {
             _connectionString = connectionString;
         }
@@ -22,7 +22,7 @@ namespace Xlent.Lever.Libraries2.SqlServer.Logic
         /// Get a new SQL Connection
         /// </summary>
         /// <returns>A new <see cref="SqlConnection"/></returns>
-        protected virtual SqlConnection NewSqlConnection()
+        public virtual SqlConnection NewSqlConnection()
         {
             return new SqlConnection(_connectionString);
         }
