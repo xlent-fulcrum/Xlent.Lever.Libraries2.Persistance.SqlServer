@@ -48,7 +48,6 @@
   <ItemGroup>
     <Compile Include="DoubleForeignTableHandler.cs" />
     <Compile Include="ForeignKeyTableHandler.cs" />
-    <Compile Include="GroupedTableHandler.cs" />
     <Compile Include="Logic\Database.cs" />
     <Compile Include="Logic\SqlHelper.cs" />
     <Compile Include="Logic\ISearch.cs" />

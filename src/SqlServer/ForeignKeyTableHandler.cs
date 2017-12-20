@@ -6,10 +6,11 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer
 {
-    public class ForeignKeyTableHandler<TLocalItem, TForeignItem> : GroupedTableHandler<TLocalItem, Guid>
+    public class ForeignKeyTableHandler<TLocalItem, TForeignItem> : SimpleTableHandler<TLocalItem>
         where TLocalItem : ITableItem, IValidatable
         where TForeignItem : ITableItem, IValidatable
     {
+        public string GroupColumnName { get; }
         public SimpleTableHandler<TForeignItem> ForeignHandler { get; }
 
         /// <summary>
@@ -20,17 +21,18 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <param name="groupColumnName"></param>
         /// <param name="foreignHandler"></param>
         public ForeignKeyTableHandler(string connectionString, ISqlTableMetadata tableMetadata, string groupColumnName, SimpleTableHandler<TForeignItem> foreignHandler)
-            : base(connectionString, tableMetadata, groupColumnName)
+            : base(connectionString, tableMetadata)
         {
+            GroupColumnName = groupColumnName;
             ForeignHandler = foreignHandler;
         }
 
         public async Task<PageEnvelope<TForeignItem>> ReadForeignAsync(Guid groupValue, int offset = 0, int? limit = null)
         {
-            var selectRest = $"FROM [{SimpleTableHandler.TableMetadata.TableName}] AS local" +
+            var selectRest = $"FROM [{TableMetadata.TableName}] AS local" +
                              $" JOIN [{ForeignHandler.TableName}] AS foregin ON (foreign.Id = local.{GroupColumnName})" +
                              $" WHERE local.[{GroupColumnName}] = @GroupValue";
-            return await ForeignHandler.SearchAdvancedAsync("SELECT COUNT(foreign.[Id])", "SELECT foreign.*", selectRest, SimpleTableHandler.TableMetadata.OrderBy("local."), new { GroupValue = groupValue }, offset, limit);
+            return await ForeignHandler.SearchAdvancedAsync("SELECT COUNT(foreign.[Id])", "SELECT foreign.*", selectRest, TableMetadata.OrderBy("local."), new { GroupValue = groupValue }, offset, limit);
         }
     }
 }

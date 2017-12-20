@@ -17,7 +17,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
     /// Helper class for advanced SELECT statmements
     /// </summary>
     /// <typeparam name="TDatabaseItem"></typeparam>
-    public partial class SimpleTableHandler<TDatabaseItem> : CrudBase<TDatabaseItem, Guid>
+    public partial class SimpleTableHandler<TDatabaseItem> 
         where TDatabaseItem : ITableItem, IValidatable
     {
         public Database Database { get; }
@@ -105,7 +105,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
             }
         }
     }
-    public partial class SimpleTableHandler<TDatabaseItem> : CrudBase<TDatabaseItem, Guid>, ISearch<TDatabaseItem>
+    public partial class SimpleTableHandler<TDatabaseItem> : ISearch<TDatabaseItem>
         where TDatabaseItem : ITableItem, IValidatable
     {
         #region ISearch
