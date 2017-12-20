@@ -17,8 +17,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
     /// Helper class for advanced SELECT statmements
     /// </summary>
     /// <typeparam name="TDatabaseItem"></typeparam>
-    public partial class SimpleTableHandler<TDatabaseItem> 
-        where TDatabaseItem : ITableItem, IValidatable
+    public partial class SimpleTableHandler<TDatabaseItem>
     {
         public Database Database { get; }
         public ISqlTableMetadata TableMetadata { get; }
@@ -41,14 +40,13 @@ namespace Xlent.Lever.Libraries2.SqlServer
     }
 
     public partial class SimpleTableHandler<TDatabaseItem> : CrudBase<TDatabaseItem, Guid>
-            where TDatabaseItem : ITableItem, IValidatable
     {
         /// <inheritdoc />
         public override async Task CreateWithSpecifiedIdAsync(Guid id, TDatabaseItem item)
         {
             InternalContract.RequireNotNull(item, nameof(item));
+            MaybeValidate(item);
             MaybeCreateNewEtag(item);
-            InternalContract.RequireValidated(item, nameof(item));
             using (var db = Database.NewSqlConnection())
             {
                 await db.ExecuteAsync(SqlHelper.Create(TableMetadata), item);
@@ -81,32 +79,32 @@ namespace Xlent.Lever.Libraries2.SqlServer
         public override async Task UpdateAsync(Guid id, TDatabaseItem item)
         {
             InternalContract.RequireNotNull(item, nameof(item));
-            InternalContract.RequireValidated(item, nameof(item));
-            await InternalUpdateAsync(item);
+            MaybeValidate(item);
+            await InternalUpdateAsync(id, item);
         }
 
-        private async Task InternalUpdateAsync(TDatabaseItem item)
+        private async Task InternalUpdateAsync(Guid id, TDatabaseItem item)
         {
             InternalContract.RequireNotNull(item, nameof(item));
-            InternalContract.RequireValidated(item, nameof(item));
-            var oldItem = await ReadAsync(item.Id);
-            if (oldItem == null)
-                throw new FulcrumNotFoundException($"Table {TableMetadata.TableName} did not contain an item with id {item.Id}");
-            if (!string.Equals(oldItem.Etag, item.Etag))
-                throw new FulcrumConflictException(
-                    "Could not update. Your data was stale. Please reload and try again.");
-            item.Etag = Guid.NewGuid().ToString();
+            MaybeValidate(item);
+            await MaybeVerifyEtagForUpdateAsync(id, item);
             using (var db = Database.NewSqlConnection())
             {
-                var count = await db.ExecuteAsync(SqlHelper.Update(TableMetadata, oldItem.Etag), item);
-                if (count == 0)
-                    throw new FulcrumConflictException(
-                        "Could not update. Your data was stale. Please reload and try again.");
+                if (item is IOptimisticConcurrencyControlByETag etaggable)
+                {
+                    var count = await db.ExecuteAsync(SqlHelper.Update(TableMetadata, etaggable.Etag), item);
+                    if (count == 0)
+                        throw new FulcrumConflictException(
+                            "Could not update. Your data was stale. Please reload and try again.");
+                }
+                else
+                {
+                    await db.ExecuteAsync(SqlHelper.Update(TableMetadata), item);
+                }
             }
         }
     }
     public partial class SimpleTableHandler<TDatabaseItem> : ISearch<TDatabaseItem>
-        where TDatabaseItem : ITableItem, IValidatable
     {
         #region ISearch
 

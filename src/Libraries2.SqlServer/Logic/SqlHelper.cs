@@ -13,9 +13,10 @@ namespace Xlent.Lever.Libraries2.SqlServer.Logic
         public static string Read(ISqlTableMetadata tableMetadata, string where) => $"SELECT {ColumnList(tableMetadata)} FROM [{tableMetadata.TableName}] WHERE {where}";
 
         public static string Read(ISqlTableMetadata tableMetadata, string where, string orderBy) => $"SELECT {ColumnList(tableMetadata)} FROM [{tableMetadata.TableName}] WHERE {where} ORDER BY {orderBy}";
-        
 
         public static string Update(ISqlTableMetadata tableMetadata, string oldEtag) => $"UPDATE [{tableMetadata.TableName}] SET {UpdateList(tableMetadata)} WHERE Id = @Id AND Etag == '{oldEtag}'";
+
+        public static string Update(ISqlTableMetadata tableMetadata) => $"UPDATE [{tableMetadata.TableName}] SET {UpdateList(tableMetadata)} WHERE Id = @Id";
 
         public static string DeleteBasedOnColumnValue(ISqlTableMetadata tableMetadata, string columnName, string variableName = null) => $"DELETE FROM [{tableMetadata.TableName}] WHERE {columnName} = @{variableName ?? columnName}";
 

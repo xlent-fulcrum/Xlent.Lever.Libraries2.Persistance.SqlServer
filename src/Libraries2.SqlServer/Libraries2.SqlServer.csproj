@@ -51,6 +51,7 @@
     <Compile Include="Logic\Database.cs" />
     <Compile Include="Logic\SqlHelper.cs" />
     <Compile Include="Logic\ISearch.cs" />
+    <Compile Include="Model\SqlTableMetadata.cs" />
     <Compile Include="SimpleTableHandler.cs" />
     <Compile Include="Model\ISqlTableMetadata.cs" />
     <Compile Include="Model\ITableItem.cs" />
