@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServer", "src\SqlServer\SqlServer.csproj", "{9E97FBCA-EBED-4805-B7B9-CAB45C4C40FE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Libraries2.SqlServer", "src\Libraries2.SqlServer\Libraries2.SqlServer.csproj", "{9E97FBCA-EBED-4805-B7B9-CAB45C4C40FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
