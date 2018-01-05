@@ -13,7 +13,7 @@ namespace Libraries2.SqlServer.Test
     [TestClass]
     public class CrudTestEtag : TestICrudEtag<Guid>
     {
-        private SimpleTableHandler<TestItemEtag> _storage;
+        private SimpleTableHandler<TestItemEtag<Guid>> _storage;
 
         [TestInitialize]
         public void Inititalize()
@@ -21,9 +21,9 @@ namespace Libraries2.SqlServer.Test
             FulcrumApplicationHelper.UnitTestSetup(nameof(CrudTestEtag));
             var connectionString = ConfigurationManager.AppSettings["ConnectionString"];
             var tableMetadata = new SqlTableMetadata();
-            _storage = new SimpleTableHandler<TestItemEtag>(connectionString, tableMetadata);
+            _storage = new SimpleTableHandler<TestItemEtag<Guid>>(connectionString, tableMetadata);
         }
 
-        protected override ICrud<TestItemEtag, Guid> CrudStorage => _storage;
+        protected override ICrud<TestItemEtag<Guid>, Guid> CrudStorage => _storage;
     }
 }

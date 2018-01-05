@@ -13,7 +13,7 @@ namespace Libraries2.SqlServer.Test
     [TestClass]
     public class CrudTestValidated : TestICrudValidated<Guid>
     {
-        private SimpleTableHandler<TestItemValidated> _storage;
+        private SimpleTableHandler<TestItemValidated<Guid>> _storage;
 
         [TestInitialize]
         public void Inititalize()
@@ -21,9 +21,9 @@ namespace Libraries2.SqlServer.Test
             FulcrumApplicationHelper.UnitTestSetup(nameof(CrudTestValidated));
             var connectionString = ConfigurationManager.AppSettings["ConnectionString"];
             var tableMetadata = new SqlTableMetadata();
-            _storage = new SimpleTableHandler<TestItemValidated>(connectionString, tableMetadata);
+            _storage = new SimpleTableHandler<TestItemValidated<Guid>>(connectionString, tableMetadata);
         }
 
-        protected override ICrud<TestItemValidated, Guid> CrudStorage => _storage;
+        protected override ICrud<TestItemValidated<Guid>, Guid> CrudStorage => _storage;
     }
 }
