@@ -46,12 +46,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cache\CacheItem.cs" />
+    <Compile Include="Cache\TimeLimitedCache.cs" />
     <Compile Include="DoubleForeignTableHandler.cs" />
     <Compile Include="ForeignKeyTableHandler.cs" />
     <Compile Include="Logic\Database.cs" />
     <Compile Include="Logic\SqlHelper.cs" />
     <Compile Include="Logic\ISearch.cs" />
     <Compile Include="Model\SqlTableMetadata.cs" />
+    <Compile Include="MoveToCore\PersistanceSynchronizedWithCache.cs" />
     <Compile Include="SimpleTableHandler.cs" />
     <Compile Include="Model\ISqlTableMetadata.cs" />
     <Compile Include="Model\ITableItem.cs" />
@@ -64,6 +67,7 @@
     <None Include="packages.config" />
     <None Include="Xlent.Lever.Libraries2.SqlServer.nuspec" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>rd /s /q $(ProjectDir)lib\
