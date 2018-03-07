@@ -48,8 +48,9 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="Xlent.Lever.Libraries2.Core.NetFramework, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xlent.Lever.Libraries2.Core.NetFramework.1.16.1\lib\net46\Xlent.Lever.Libraries2.Core.NetFramework.dll</HintPath>
+    <Reference Include="Xlent.Lever.Libraries2.Core.NetFramework, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\packages\Xlent.Lever.Libraries2.Core.NetFramework.1.18.4\lib\net46\Xlent.Lever.Libraries2.Core.NetFramework.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Xlent.Lever.Libraries2.Core.Test.NuGet, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xlent.Lever.Libraries2.Core.Test.0.1.8\lib\net46\Xlent.Lever.Libraries2.Core.Test.NuGet.dll</HintPath>
