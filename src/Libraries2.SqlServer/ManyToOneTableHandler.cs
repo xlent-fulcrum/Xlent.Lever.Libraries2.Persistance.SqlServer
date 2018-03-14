@@ -29,7 +29,16 @@ namespace Xlent.Lever.Libraries2.SqlServer
             OneTableHandler = oneTableHandler;
         }
 
-        public async Task<PageEnvelope<TOneModel>> ReadAllParentsInGroupAsync(string groupColumnName, Guid groupColumnValue, int offset = 0, int? limit = null)
+        /// <summary>
+        /// Read all referenced items that a specific column references.
+        /// </summary>
+        /// <param name="groupColumnName"></param>
+        /// <param name="groupColumnValue"></param>
+        /// <param name="offset"></param>
+        /// <param name="limit"></param>
+        /// <returns></returns>
+        /// <remarks>This method is here to support the <see cref="ManyToManyTableHandler{TDatabaseItem,TOneModel1,TOneModel2}."/></remarks>
+        internal async Task<PageEnvelope<TOneModel>> ReadAllParentsInGroupAsync(string groupColumnName, Guid groupColumnValue, int offset = 0, int? limit = null)
         {
             var selectRest = $"FROM [{TableMetadata.TableName}] AS many" +
                              $" JOIN [{OneTableHandler.TableName}] AS one ON (one.Id = many.[{ParentColumnName}])" +
