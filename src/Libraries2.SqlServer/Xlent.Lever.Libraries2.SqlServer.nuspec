@@ -16,7 +16,7 @@
     <tags>fulcrum lever nexus</tags>
     <dependencies>
       <group targetFramework="net46">
-        <dependency id="Xlent.Lever.Libraries2.Core.NetFramework" version="1.18.5" />
+        <dependency id="Xlent.Lever.Libraries2.Core.NetFramework" version="1.19.0" />
         <dependency id="Dapper" version="1.50.4" />
       </group>
     </dependencies>
