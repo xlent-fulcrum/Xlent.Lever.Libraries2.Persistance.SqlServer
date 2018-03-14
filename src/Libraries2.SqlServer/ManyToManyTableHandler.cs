@@ -8,13 +8,13 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer
 {
-    public class ManyToManyTableHandler<TDatabaseItem, TReferenceModel1, TReferenceModel2> : SimpleTableHandler<TDatabaseItem>, IManyToManyRelation<TReferenceModel1, TReferenceModel2, Guid>
-        where TDatabaseItem : ITableItem, IValidatable
+    public class ManyToManyTableHandler<TManyToManyModel, TReferenceModel1, TReferenceModel2> : SimpleTableHandler<TManyToManyModel>, IManyToManyRelation<TReferenceModel1, TReferenceModel2, Guid>
+        where TManyToManyModel : ITableItem, IValidatable
         where TReferenceModel1 : ITableItem, IValidatable
         where TReferenceModel2 : ITableItem, IValidatable
     {
-        public ManyToOneTableHandler<TDatabaseItem, TReferenceModel1> OneTableHandler1 { get; }
-        public ManyToOneTableHandler<TDatabaseItem, TReferenceModel2> OneTableHandler2 { get; }
+        public ManyToOneTableHandler<TManyToManyModel, TReferenceModel1> OneTableHandler1 { get; }
+        public ManyToOneTableHandler<TManyToManyModel, TReferenceModel2> OneTableHandler2 { get; }
 
         /// <summary>
         /// Constructor
@@ -28,15 +28,15 @@ namespace Xlent.Lever.Libraries2.SqlServer
         public ManyToManyTableHandler(string connectionString, ISqlTableMetadata tableMetadata, string groupColumnName1, SimpleTableHandler<TReferenceModel1> referenceHandler1, string groupColumnName2, SimpleTableHandler<TReferenceModel2> referenceHandler2)
             : base(connectionString, tableMetadata)
         {
-            OneTableHandler1 = new ManyToOneTableHandler<TDatabaseItem, TReferenceModel1>(connectionString, tableMetadata, groupColumnName1, referenceHandler1);
-            OneTableHandler2 = new ManyToOneTableHandler<TDatabaseItem, TReferenceModel2>(connectionString, tableMetadata, groupColumnName2, referenceHandler2);
+            OneTableHandler1 = new ManyToOneTableHandler<TManyToManyModel, TReferenceModel1>(connectionString, tableMetadata, groupColumnName1, referenceHandler1);
+            OneTableHandler2 = new ManyToOneTableHandler<TManyToManyModel, TReferenceModel2>(connectionString, tableMetadata, groupColumnName2, referenceHandler2);
         }
 
         #region The reference table (the many-to-many table)
         /// <summary>
         /// Get the item that has the specified <paramref name="reference1Id"/> and <paramref name="reference2Id"/>.
         /// </summary>
-        public async Task<TDatabaseItem> Read(Guid reference1Id, Guid reference2Id)
+        public async Task<TManyToManyModel> Read(Guid reference1Id, Guid reference2Id)
         {
             var param = new { Reference1Id = reference1Id, Reference2Id = reference2Id};
             return await SearchWhereSingle($"{OneTableHandler1.ParentColumnName} = @Reference1Id AND {OneTableHandler2.ParentColumnName}= @Reference2Id", param);
@@ -45,7 +45,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <summary>
         /// Find all items that has foreign key 1 set to <paramref name="id"/>.
         /// </summary>
-        public async Task<PageEnvelope<TDatabaseItem>> ReadByForeignKey1(Guid id, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TManyToManyModel>> ReadByReference1(Guid id, int offset = 0, int? limit = null)
         {
             return await OneTableHandler1.ReadChildrenAsync(id, offset, limit);
         }
@@ -53,19 +53,19 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <summary>
         /// Find all items that has foreign key 2 set to <paramref name="id"/>.
         /// </summary>
-        public async Task<PageEnvelope<TDatabaseItem>> ReadByForeignKey2(Guid id, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TManyToManyModel>> ReadByReference2(Guid id, int offset = 0, int? limit = null)
         {
             return await OneTableHandler2.ReadChildrenAsync(id, offset, limit);
         }
 
         /// <inheritdoc />
-        public async Task DeleteReferencesByForeignKey1(Guid id)
+        public async Task DeleteReferencesByReference1(Guid id)
         {
             await OneTableHandler1.DeleteChildrenAsync(id);
         }
 
         /// <inheritdoc />
-        public async Task DeleteReferencesByForeignKey2(Guid id)
+        public async Task DeleteReferencesByReference2(Guid id)
         {
             await OneTableHandler2.DeleteChildrenAsync(id);
         }
@@ -74,7 +74,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         #region The referenced tables
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TReferenceModel2>> ReadReferencedItemsByForeignKey1(Guid id, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TReferenceModel2>> ReadReferencedItemsByReference1(Guid id, int offset = 0, int? limit = null)
         {
             return await OneTableHandler2.ReadAllParentsInGroupAsync(
                 OneTableHandler1.ParentColumnName,
@@ -82,7 +82,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         }
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TReferenceModel1>> ReadReferencedItemsByForeignKey2(Guid id, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TReferenceModel1>> ReadReferencedItemsByReference2(Guid id, int offset = 0, int? limit = null)
         {
             return await OneTableHandler1.ReadAllParentsInGroupAsync(
                 OneTableHandler2.ParentColumnName,
