@@ -16,8 +16,8 @@ namespace Xlent.Lever.Libraries2.SqlServer.Cache
             var tableMetadata = new SqlTableMetadata
             {
                 TableName = "Cache",
-                CustomColumnNames = ""
-            }
+                CustomColumnNames = new[] {""}
+            };
             _table = new SimpleTableHandler<CacheItem>(connectionString, tableMetadata);
         }
 
