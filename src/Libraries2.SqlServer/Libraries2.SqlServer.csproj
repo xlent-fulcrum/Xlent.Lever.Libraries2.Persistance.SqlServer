@@ -51,6 +51,10 @@
   <ItemGroup>
     <Compile Include="Cache\CacheItem.cs" />
     <Compile Include="Cache\TimeLimitedCache.cs" />
+    <Compile Include="IManyToManyRelation.cs" />
+    <Compile Include="ManyToManyTableHandler.cs" />
+    <Compile Include="ManyToOneTableHandler.cs" />
+    <Compile Include="IManyToOneRelation.cs" />
     <Compile Include="DoubleForeignTableHandler.cs" />
     <Compile Include="ForeignKeyTableHandler.cs" />
     <Compile Include="Logic\Database.cs" />

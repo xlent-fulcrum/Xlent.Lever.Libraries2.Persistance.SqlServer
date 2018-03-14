@@ -6,6 +6,7 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer
 {
+    [Obsolete("Use ManyToManyTableHandler.")]
     public class DoubleForeignTableHandler<TDatabaseItem, TForeignModel1, TForeignModel2> : SimpleTableHandler<TDatabaseItem>
         where TDatabaseItem : ITableItem, IValidatable
         where TForeignModel1 : ITableItem, IValidatable

@@ -6,6 +6,7 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer
 {
+    [Obsolete("Use ManyToOneTableHandler.")]
     public class ForeignKeyTableHandler<TLocalItem, TForeignItem> : SimpleTableHandler<TLocalItem>
         where TLocalItem : ITableItem, IValidatable
         where TForeignItem : ITableItem, IValidatable
