@@ -9,7 +9,7 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 namespace Xlent.Lever.Libraries2.SqlServer
 {
     public class ManyToManyTableHandler<TManyToManyModel, TReferenceModel1, TReferenceModel2> : SimpleTableHandler<TManyToManyModel>, IManyToManyRelation<TReferenceModel1, TReferenceModel2, Guid>
-        where TManyToManyModel : ITableItem, IValidatable
+        where TManyToManyModel : class, ITableItem, IValidatable
         where TReferenceModel1 : ITableItem, IValidatable
         where TReferenceModel2 : ITableItem, IValidatable
     {

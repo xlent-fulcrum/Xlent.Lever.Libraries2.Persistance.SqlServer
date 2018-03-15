@@ -45,13 +45,14 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="Xlent.Lever.Libraries2.Core.NetFramework, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xlent.Lever.Libraries2.Core.NetFramework.1.19.4\lib\net46\Xlent.Lever.Libraries2.Core.NetFramework.dll</HintPath>
+      <HintPath>..\..\packages\Xlent.Lever.Libraries2.Core.NetFramework.1.19.6\lib\net46\Xlent.Lever.Libraries2.Core.NetFramework.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\CacheItem.cs" />
     <Compile Include="Cache\TimeLimitedCache.cs" />
     <Compile Include="ManyToManyTableHandler.cs" />
+    <Compile Include="ManyToOneRecursiveTableHandler.cs" />
     <Compile Include="ManyToOneTableHandler.cs" />
     <Compile Include="DoubleForeignTableHandler.cs" />
     <Compile Include="ForeignKeyTableHandler.cs" />

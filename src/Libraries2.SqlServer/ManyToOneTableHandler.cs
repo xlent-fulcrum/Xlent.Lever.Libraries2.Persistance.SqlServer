@@ -8,12 +8,11 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer
 {
-    public class ManyToOneTableHandler<TManyModel, TOneModel> : SimpleTableHandler<TManyModel>, IManyToOneRelation<TManyModel, TOneModel, Guid>
-        where TManyModel : ITableItem, IValidatable
+    public class ManyToOneTableHandler<TManyModel, TOneModel> : ManyToOneRecursiveTableHandler<TManyModel>, IManyToOneRelationComplete<TManyModel, TOneModel, Guid>
+        where TManyModel : class, ITableItem, IValidatable
         where TOneModel : ITableItem, IValidatable
     {
-        public string ParentColumnName { get; }
-        public SimpleTableHandler<TOneModel> OneTableHandler { get; }
+        protected SimpleTableHandler<TOneModel> OneTableHandler { get; }
 
         /// <summary>
         /// Constructor
@@ -23,9 +22,8 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <param name="parentColumnName"></param>
         /// <param name="oneTableHandler"></param>
         public ManyToOneTableHandler(string connectionString, ISqlTableMetadata tableMetadata, string parentColumnName, SimpleTableHandler<TOneModel> oneTableHandler)
-            : base(connectionString, tableMetadata)
+            : base(connectionString, tableMetadata, parentColumnName)
         {
-            ParentColumnName = parentColumnName;
             OneTableHandler = oneTableHandler;
         }
 
@@ -38,7 +36,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <param name="limit"></param>
         /// <returns></returns>
         /// <remarks>This method is here to support the <see cref="ManyToManyTableHandler{TDatabaseItem,TOneModel1,TOneModel2}."/></remarks>
-        internal async Task<PageEnvelope<TOneModel>> ReadAllParentsInGroupAsync(string groupColumnName, Guid groupColumnValue, int offset = 0, int? limit = null)
+        internal new async Task<PageEnvelope<TOneModel>> ReadAllParentsInGroupAsync(string groupColumnName, Guid groupColumnValue, int offset = 0, int? limit = null)
         {
             var selectRest = $"FROM [{TableMetadata.TableName}] AS many" +
                              $" JOIN [{OneTableHandler.TableName}] AS one ON (one.Id = many.[{ParentColumnName}])" +
@@ -47,32 +45,13 @@ namespace Xlent.Lever.Libraries2.SqlServer
         }
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TManyModel>> ReadChildrenAsync(Guid parentId, int offset = 0, int? limit = null)
-        {
-            return await SearchWhereAsync($"[{ParentColumnName}] = @ParentId", null, new { ParentId = parentId }, offset, limit);
-        }
-
-        /// <inheritdoc />
-        public async Task<TOneModel> ReadParentAsync(Guid childId)
+        public new async Task<TOneModel> ReadParentAsync(Guid childId)
         {
             var selectStatement = "SELECT one.*" +
                              $" FROM [{TableMetadata.TableName}] AS many" +
                              $" JOIN [{OneTableHandler.TableName}] AS one ON (one.Id = many.[{ParentColumnName}])" +
                              $" WHERE many.[Id] = @ChildId";
             return await OneTableHandler.SearchAdvancedSingleAsync(selectStatement, new { ChildId = childId });
-        }
-
-        /// <inheritdoc />
-        public async Task DeleteChildrenAsync(Guid parentId)
-        {
-            using (IDbConnection db = Database.NewSqlConnection())
-            {
-                var sqlQuery = "DELETE" +
-                               $" FROM [{TableMetadata.TableName}]" +
-                               $" WHERE [{ParentColumnName}] = @ParentId";
-
-                await db.ExecuteAsync(sqlQuery, new { ParentId = parentId});
-            }
         }
     }
 }
