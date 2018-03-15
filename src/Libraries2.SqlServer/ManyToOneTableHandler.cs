@@ -9,8 +9,8 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 namespace Xlent.Lever.Libraries2.SqlServer
 {
     public class ManyToOneTableHandler<TManyModel, TOneModel> : ManyToOneRecursiveTableHandler<TManyModel>, IManyToOneRelationComplete<TManyModel, TOneModel, Guid>
-        where TManyModel : class, ITableItem, IValidatable
-        where TOneModel : ITableItem, IValidatable
+        where TManyModel : class, ITableItem
+        where TOneModel : ITableItem
     {
         protected SimpleTableHandler<TOneModel> OneTableHandler { get; }
 

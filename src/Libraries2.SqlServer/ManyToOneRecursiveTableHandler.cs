@@ -9,7 +9,7 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 namespace Xlent.Lever.Libraries2.SqlServer
 {
     public class ManyToOneRecursiveTableHandler<TModel> : SimpleTableHandler<TModel>, IManyToOneRecursiveRelationComplete<TModel, Guid>
-        where TModel : class, ITableItem, IValidatable
+        where TModel : class, ITableItem
     {
         public string ParentColumnName { get; }
 
