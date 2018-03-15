@@ -22,61 +22,61 @@ namespace Xlent.Lever.Libraries2.SqlServer.Cache
         }
 
         /// <inheritdoc />
-        public async Task<TId> CreateAsync(TItem item)
+        public Task<TId> CreateAsync(TItem item)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        public async Task<TItem> CreateAndReturnAsync(TItem item)
+        public Task<TItem> CreateAndReturnAsync(TItem item)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        public async Task CreateWithSpecifiedIdAsync(TId id, TItem item)
+        public Task CreateWithSpecifiedIdAsync(TId id, TItem item)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        public async Task<TItem> CreateWithSpecifiedIdAndReturnAsync(TId id, TItem item)
+        public Task<TItem> CreateWithSpecifiedIdAndReturnAsync(TId id, TItem item)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        public async Task<TItem> ReadAsync(TId id)
+        public Task<TItem> ReadAsync(TId id)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        public async Task DeleteAsync(TId id)
+        public Task DeleteAsync(TId id)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TItem>> ReadAllAsync(int offset = 0, int? limit = null)
+        public Task<PageEnvelope<TItem>> ReadAllAsync(int offset = 0, int? limit = null)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        public async Task DeleteAllAsync()
+        public Task DeleteAllAsync()
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        public async Task UpdateAsync(TId id, TItem item)
+        public Task UpdateAsync(TId id, TItem item)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        public async Task<TItem> UpdateAndReturnAsync(TId id, TItem item)
+        public Task<TItem> UpdateAndReturnAsync(TId id, TItem item)
         {
             throw new NotImplementedException();
         }

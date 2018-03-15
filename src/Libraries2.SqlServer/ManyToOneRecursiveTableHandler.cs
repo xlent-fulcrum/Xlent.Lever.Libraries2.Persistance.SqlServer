@@ -8,8 +8,8 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer
 {
-    public class ManyToOneRecursiveTableHandler<TModel> : SimpleTableHandler<TModel>, IManyToOneRecursiveRelationComplete<TModel, Guid, Guid>
-        where TModel : class, ITableItem
+    public class ManyToOneRecursiveTableHandler<TModel> : SimpleTableHandler<TModel>, IManyToOneRecursiveRelationComplete<TModel, Guid>
+        where TModel : class
     {
         public string ParentColumnName { get; }
 
