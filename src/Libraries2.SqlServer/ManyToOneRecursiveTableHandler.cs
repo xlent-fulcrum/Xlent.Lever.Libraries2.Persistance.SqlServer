@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Xlent.Lever.Libraries2.Core.Assert;
+using Xlent.Lever.Libraries2.Core.Storage.Logic;
 using Xlent.Lever.Libraries2.Core.Storage.Model;
 using Xlent.Lever.Libraries2.SqlServer.Model;
 
@@ -53,19 +54,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <inheritdoc />
         public async Task<IEnumerable<TModel>> ReadChildrenAsync(Guid parentId, int limit = int.MaxValue)
         {
-            var result = new List<TModel>();
-            var offset = 0;
-            while (true)
-            {
-                var page = await ReadAllWithPagingAsync(offset);
-                if (page.PageInfo.Returned == 0) break;
-                var returned = page.PageInfo.Returned;
-                if (offset + returned > limit) returned = limit - offset;
-                result.AddRange(page.Data.Take(returned));
-                offset += page.PageInfo.Returned;
-            }
-
-            return result;
+            return await StorageHelper.ReadPages(offset => ReadChildrenWithPagingAsync(parentId, offset));
         }
 
         /// <inheritdoc />

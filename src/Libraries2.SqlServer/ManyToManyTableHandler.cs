@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using Dapper;
 using Xlent.Lever.Libraries2.Core.Assert;
+using Xlent.Lever.Libraries2.Core.Storage.Logic;
 using Xlent.Lever.Libraries2.Core.Storage.Model;
 using Xlent.Lever.Libraries2.SqlServer.Model;
 
@@ -43,19 +45,35 @@ namespace Xlent.Lever.Libraries2.SqlServer
         }
 
         /// <summary>
-        /// Find all items that has foreign key 1 set to <paramref name="id"/>.
+        /// Find all many-to-many items that has foreign key 1 set to <paramref name="id"/>.
         /// </summary>
-        public async Task<PageEnvelope<TManyToManyModel>> ReadByReference1(Guid id, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TManyToManyModel>> ReadByReference1WithPaging(Guid id, int offset = 0, int? limit = null)
         {
             return await OneTableHandler1.ReadChildrenWithPagingAsync(id, offset, limit);
         }
 
         /// <summary>
-        /// Find all items that has foreign key 2 set to <paramref name="id"/>.
+        /// Find all many-to-many items that has foreign key 1 set to <paramref name="id"/>.
         /// </summary>
-        public async Task<PageEnvelope<TManyToManyModel>> ReadByReference2(Guid id, int offset = 0, int? limit = null)
+        public async Task<IEnumerable<TManyToManyModel>> ReadByReference1(Guid id, int limit = int.MaxValue)
+        {
+            return await StorageHelper.ReadPages(offset => ReadByReference1WithPaging(id, offset));
+        }
+
+        /// <summary>
+        /// Find all many-to-many items that has foreign key 2 set to <paramref name="id"/>.
+        /// </summary>
+        public async Task<PageEnvelope<TManyToManyModel>> ReadByReference2WithPaging(Guid id, int offset = 0, int? limit = null)
         {
             return await OneTableHandler2.ReadChildrenWithPagingAsync(id, offset, limit);
+        }
+
+        /// <summary>
+        /// Find all many-to-many items that has foreign key 1 set to <paramref name="id"/>.
+        /// </summary>
+        public async Task<IEnumerable<TManyToManyModel>> ReadByReference2(Guid id, int limit = int.MaxValue)
+        {
+            return await StorageHelper.ReadPages(offset => ReadByReference2WithPaging(id, offset));
         }
 
         /// <inheritdoc />
