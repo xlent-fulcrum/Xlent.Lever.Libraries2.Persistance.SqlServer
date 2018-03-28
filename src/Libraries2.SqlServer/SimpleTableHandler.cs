@@ -63,7 +63,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
             }
         }
 
-        public override async Task<PageEnvelope<TDatabaseItem>> ReadAllAsync(int offset = 0, int? limit = null)
+        public override async Task<PageEnvelope<TDatabaseItem>> ReadAllWithPagingAsync(int offset = 0, int? limit = null)
         {
             return await SearchAllAsync(null, offset, limit);
         }

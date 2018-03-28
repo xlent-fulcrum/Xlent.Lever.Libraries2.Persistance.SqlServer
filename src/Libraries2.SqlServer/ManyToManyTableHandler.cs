@@ -47,7 +47,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// </summary>
         public async Task<PageEnvelope<TManyToManyModel>> ReadByReference1(Guid id, int offset = 0, int? limit = null)
         {
-            return await OneTableHandler1.ReadChildrenAsync(id, offset, limit);
+            return await OneTableHandler1.ReadChildrenWithPagingAsync(id, offset, limit);
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// </summary>
         public async Task<PageEnvelope<TManyToManyModel>> ReadByReference2(Guid id, int offset = 0, int? limit = null)
         {
-            return await OneTableHandler2.ReadChildrenAsync(id, offset, limit);
+            return await OneTableHandler2.ReadChildrenWithPagingAsync(id, offset, limit);
         }
 
         /// <inheritdoc />

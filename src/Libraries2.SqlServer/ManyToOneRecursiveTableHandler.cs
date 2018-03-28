@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Xlent.Lever.Libraries2.Core.Assert;
@@ -43,9 +45,27 @@ namespace Xlent.Lever.Libraries2.SqlServer
         }
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TModel>> ReadChildrenAsync(Guid parentId, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TModel>> ReadChildrenWithPagingAsync(Guid parentId, int offset = 0, int? limit = null)
         {
             return await SearchWhereAsync($"[{ParentColumnName}] = @ParentId", null, new { ParentId = parentId }, offset, limit);
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<TModel>> ReadChildrenAsync(Guid parentId, int limit = int.MaxValue)
+        {
+            var result = new List<TModel>();
+            var offset = 0;
+            while (true)
+            {
+                var page = await ReadAllWithPagingAsync(offset);
+                if (page.PageInfo.Returned == 0) break;
+                var returned = page.PageInfo.Returned;
+                if (offset + returned > limit) returned = limit - offset;
+                result.AddRange(page.Data.Take(returned));
+                offset += page.PageInfo.Returned;
+            }
+
+            return result;
         }
 
         /// <inheritdoc />
