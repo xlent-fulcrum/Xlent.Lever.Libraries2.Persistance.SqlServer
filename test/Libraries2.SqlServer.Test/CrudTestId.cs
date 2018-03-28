@@ -20,7 +20,12 @@ namespace Libraries2.SqlServer.Test
         {
             FulcrumApplicationHelper.UnitTestSetup(nameof(CrudTestId));
             var connectionString = ConfigurationManager.AppSettings["ConnectionString"];
-            var tableMetadata = new SqlTableMetadata();
+            var tableMetadata = new SqlTableMetadata
+            {
+                TableName = "TestItem",
+                CustomColumnNames = new[] { "Value" },
+                OrderBy = new string[] {}
+            };
             _storage = new SimpleTableHandler<TestItemId<Guid>>(connectionString, tableMetadata);
         }
 

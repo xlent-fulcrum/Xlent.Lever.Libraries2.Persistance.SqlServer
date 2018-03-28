@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Xlent.Lever.Libraries2.Core.Assert;
 using Xlent.Lever.Libraries2.Core.Storage.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer.Model
@@ -6,13 +7,15 @@ namespace Xlent.Lever.Libraries2.SqlServer.Model
     /// <summary>
     /// Metadata for creating SQL statmements
     /// </summary>
-    public interface ISqlTableMetadata
+    public interface ISqlTableMetadata : IValidatable
     {
         /// <summary>
         /// The name of the database table that will hold this type of items.
         /// </summary>
         /// <remarks>Will be surrounded with dbo.[{TableName}}, i.e. just specify the name, no brackets needed.</remarks>
         string TableName { get; }
+
+        string EtagColumnName { get; }
 
         /// <summary>
         /// The name of column that has the foreign key or null.
@@ -35,8 +38,13 @@ namespace Xlent.Lever.Libraries2.SqlServer.Model
         IEnumerable<string> CustomColumnNames { get; }
 
         /// <summary>
+        /// The name of columns that we should order the rows by.
+        /// </summary>
+        IEnumerable<string> OrderBy { get; }
+
+        /// <summary>
         /// Will be used as "ORDER BY {OrderBy}" when selecting multiple rows from the table.
         /// </summary>
-        string OrderBy(string columnPrefix = null);
+        string GetOrderBy(string columnPrefix = null);
     }
 }

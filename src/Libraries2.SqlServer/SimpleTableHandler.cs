@@ -29,6 +29,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <param name="tableMetadata"></param>
         public SimpleTableHandler(string connectionString, ISqlTableMetadata tableMetadata)
         {
+            InternalContract.RequireValidated(tableMetadata, nameof(tableMetadata));
             Database = new Database(connectionString);
             TableMetadata = tableMetadata;
         }
@@ -40,16 +41,20 @@ namespace Xlent.Lever.Libraries2.SqlServer
     }
 
     public partial class SimpleTableHandler<TDatabaseItem> : CrudBase<TDatabaseItem, Guid>
+    where TDatabaseItem : IUniquelyIdentifiable<Guid>
     {
         /// <inheritdoc />
         public override async Task CreateWithSpecifiedIdAsync(Guid id, TDatabaseItem item)
         {
+            InternalContract.RequireNotDefaultValue(id, nameof(id));
             InternalContract.RequireNotNull(item, nameof(item));
+            item.Id = id;
             MaybeValidate(item);
             MaybeCreateNewEtag(item);
             using (var db = Database.NewSqlConnection())
             {
-                await db.ExecuteAsync(SqlHelper.Create(TableMetadata), item);
+                var sql = SqlHelper.Create(TableMetadata);
+                await db.ExecuteAsync(sql, item);
             }
         }
 
@@ -92,14 +97,16 @@ namespace Xlent.Lever.Libraries2.SqlServer
             {
                 if (item is IOptimisticConcurrencyControlByETag etaggable)
                 {
-                    var count = await db.ExecuteAsync(SqlHelper.Update(TableMetadata, etaggable.Etag), item);
+                    var sql = SqlHelper.Update(TableMetadata, etaggable.Etag);
+                    var count = await db.ExecuteAsync(sql, item);
                     if (count == 0)
                         throw new FulcrumConflictException(
                             "Could not update. Your data was stale. Please reload and try again.");
                 }
                 else
                 {
-                    await db.ExecuteAsync(SqlHelper.Update(TableMetadata), item);
+                    var sql = SqlHelper.Update(TableMetadata);
+                    await db.ExecuteAsync(sql, item);
                 }
             }
         }
@@ -248,7 +255,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
             InternalContract.RequireGreaterThanOrEqualTo(0, offset, nameof(offset));
             InternalContract.RequireGreaterThanOrEqualTo(0, limit, nameof(limit));
             InternalContract.RequireNotNullOrWhitespace(selectStatement, nameof(selectStatement));
-            orderBy = orderBy ?? TableMetadata.OrderBy() ?? "1";
+            orderBy = orderBy ?? TableMetadata.GetOrderBy() ?? "1";
             using (IDbConnection db = Database.NewSqlConnection())
             {
                 var sqlQuery = $"{selectStatement} " +

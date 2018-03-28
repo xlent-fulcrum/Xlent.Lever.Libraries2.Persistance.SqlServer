@@ -9,7 +9,8 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 namespace Xlent.Lever.Libraries2.SqlServer
 {
     public class ManyToOneTableHandler<TManyModel, TOneModel> : ManyToOneRecursiveTableHandler<TManyModel>, IManyToOneRelationComplete<TManyModel, TOneModel, Guid>
-        where TManyModel : class
+        where TManyModel : class, IUniquelyIdentifiable<Guid> 
+        where TOneModel : IUniquelyIdentifiable<Guid>
     {
         protected SimpleTableHandler<TOneModel> OneTableHandler { get; }
 
@@ -40,7 +41,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
             var selectRest = $"FROM [{TableMetadata.TableName}] AS many" +
                              $" JOIN [{OneTableHandler.TableName}] AS one ON (one.Id = many.[{ParentColumnName}])" +
                              $" WHERE [{groupColumnName}] = @ColumnValue";
-            return await OneTableHandler.SearchAdvancedAsync("SELECT COUNT(one.[Id])", "SELECT one.*", selectRest, TableMetadata.OrderBy("many."), new { ColumnValue = groupColumnValue }, offset, limit);
+            return await OneTableHandler.SearchAdvancedAsync("SELECT COUNT(one.[Id])", "SELECT one.*", selectRest, TableMetadata.GetOrderBy("many."), new { ColumnValue = groupColumnValue }, offset, limit);
         }
 
         /// <inheritdoc />

@@ -12,7 +12,7 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 namespace Xlent.Lever.Libraries2.SqlServer
 {
     public class ManyToOneRecursiveTableHandler<TModel> : SimpleTableHandler<TModel>, IManyToOneRecursiveRelationComplete<TModel, Guid>
-        where TModel : class
+        where TModel : class, IUniquelyIdentifiable<Guid>
     {
         public string ParentColumnName { get; }
 
@@ -42,7 +42,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
             var selectRest = $"FROM [{TableMetadata.TableName}] AS many" +
                              $" JOIN [{TableName}] AS one ON (one.Id = many.[{ParentColumnName}])" +
                              $" WHERE [{groupColumnName}] = @ColumnValue";
-            return await SearchAdvancedAsync("SELECT COUNT(one.[Id])", "SELECT one.*", selectRest, TableMetadata.OrderBy("many."), new { ColumnValue = groupColumnValue }, offset, limit);
+            return await SearchAdvancedAsync("SELECT COUNT(one.[Id])", "SELECT one.*", selectRest, TableMetadata.GetOrderBy("many."), new { ColumnValue = groupColumnValue }, offset, limit);
         }
 
         /// <inheritdoc />

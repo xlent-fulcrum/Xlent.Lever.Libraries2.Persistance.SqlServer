@@ -55,13 +55,12 @@
       <HintPath>..\..\packages\Xlent.Lever.Libraries2.Core.NetFramework.1.20.4\lib\net46\Xlent.Lever.Libraries2.Core.NetFramework.dll</HintPath>
     </Reference>
     <Reference Include="Xlent.Lever.Libraries2.Core.Test.NuGet, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xlent.Lever.Libraries2.Core.Test.0.2.0\lib\net46\Xlent.Lever.Libraries2.Core.Test.NuGet.dll</HintPath>
+      <HintPath>..\..\packages\Xlent.Lever.Libraries2.Core.Test.0.2.2\lib\net46\Xlent.Lever.Libraries2.Core.Test.NuGet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MemoryManyToOneRecursive.cs" />
     <Compile Include="ManyToOneRecursive.cs" />
-    <Compile Include="CrudTestBare.cs" />
+    <Compile Include="ManyToOneTest.cs" />
     <Compile Include="CrudTestEtag.cs" />
     <Compile Include="CrudTestId.cs" />
     <Compile Include="CrudTestTimeStamped.cs" />
@@ -77,6 +76,9 @@
       <Project>{9e97fbca-ebed-4805-b7b9-cab45c4c40fe}</Project>
       <Name>Libraries2.SqlServer</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="scripts\Create schema.sql" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

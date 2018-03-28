@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using Xlent.Lever.Libraries2.Core.Assert;
 
 namespace Xlent.Lever.Libraries2.SqlServer.Model
 {
@@ -6,6 +8,10 @@ namespace Xlent.Lever.Libraries2.SqlServer.Model
     {
         /// <inheritdoc />
         public string TableName { get; set; }
+
+        /// <inheritdoc />
+        public string EtagColumnName { get; set; }
+
         /// <inheritdoc />
         public string ForeignKeyColumnName { get; set; }
         /// <inheritdoc />
@@ -14,10 +20,23 @@ namespace Xlent.Lever.Libraries2.SqlServer.Model
         public string UpdatedAtColumnName { get; set; }
         /// <inheritdoc />
         public IEnumerable<string> CustomColumnNames { get; set; }
+
         /// <inheritdoc />
-        public string OrderBy(string columnPrefix = null)
+        public IEnumerable<string> OrderBy { get; set; }
+
+        /// <inheritdoc />
+        public string GetOrderBy(string columnPrefix = null)
         {
-            throw new System.NotImplementedException();
+            var orderBy = string.Join(", ", OrderBy.Select(x => $"{columnPrefix}.{x}"));
+            return string.IsNullOrWhiteSpace(orderBy) ? null : orderBy;
+        }
+
+        /// <inheritdoc />
+        public void Validate(string errorLocation, string propertyPath = "")
+        {
+            FulcrumValidate.IsNotNullOrWhiteSpace(TableName, nameof(TableName), errorLocation);
+            FulcrumValidate.IsNotNull(CustomColumnNames, nameof(CustomColumnNames), errorLocation);
+            FulcrumValidate.IsNotNull(OrderBy, nameof(OrderBy), errorLocation);
         }
     }
 }

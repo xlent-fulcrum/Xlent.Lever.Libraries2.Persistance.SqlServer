@@ -20,7 +20,13 @@ namespace Libraries2.SqlServer.Test
         {
             FulcrumApplicationHelper.UnitTestSetup(nameof(CrudTestEtag));
             var connectionString = ConfigurationManager.AppSettings["ConnectionString"];
-            var tableMetadata = new SqlTableMetadata();
+            var tableMetadata = new SqlTableMetadata
+            {
+                TableName = "TestItem",
+                EtagColumnName = "Etag",
+                CustomColumnNames = new[] { "Value" },
+                OrderBy = new string[] { }
+            };
             _storage = new SimpleTableHandler<TestItemEtag<Guid>>(connectionString, tableMetadata);
         }
 

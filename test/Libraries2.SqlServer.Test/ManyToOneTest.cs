@@ -11,27 +11,29 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 namespace Libraries2.SqlServer.Test
 {
     [TestClass]
-    public class MemoryManyToOneRecursive : TestIManyToOneRecursive<Guid, Guid?>
+    public class ManyToOneTest : TestIManyToOne<Guid, Guid?>
     {
-        private IManyToOneRecursiveRelationComplete<TestItemManyToOne<Guid, Guid?>, Guid> _storage;
+        private SimpleTableHandler<TestItemId<Guid>> _oneStorage;
+        private IManyToOneRelationComplete<TestItemManyToOne<Guid, Guid?>, TestItemId<Guid>, Guid> _manyStorage;
 
         [TestInitialize]
         public void Inititalize()
         {
             var connectionString = ConfigurationManager.AppSettings["ConnectionString"];
             var tableMetadata = new SqlTableMetadata();
-            _storage = new ManyToOneRecursiveTableHandler<TestItemManyToOne<Guid, Guid?>>(connectionString, tableMetadata, "ParentId");
+            _oneStorage = new SimpleTableHandler<TestItemId<Guid>>(connectionString, tableMetadata);
+            _manyStorage = new ManyToOneTableHandler<TestItemManyToOne<Guid, Guid?>, TestItemId<Guid>>(connectionString, tableMetadata, "ParentId", _oneStorage);
         }
 
         /// <inheritdoc />
         protected override IManyToOneRecursiveRelationComplete<TestItemManyToOne<Guid, Guid?>, Guid>
-            ManyStorageRecursive => _storage;
+            ManyStorageRecursive => null;
 
         /// <inheritdoc />
         protected override IManyToOneRelationComplete<TestItemManyToOne<Guid, Guid?>, TestItemId<Guid>, Guid>
-            ManyStorageNonRecursive => null;
+            ManyStorageNonRecursive => _manyStorage;
 
         /// <inheritdoc />
-        protected override ICrd<TestItemId<Guid>, Guid> OneStorage => null;
+        protected override ICrd<TestItemId<Guid>, Guid> OneStorage => _oneStorage;
     }
 }
