@@ -92,7 +92,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         #region The referenced tables
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TReferenceModel2>> ReadReferencedItemsByReference1(Guid id, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TReferenceModel2>> ReadReferencedItemsByReference1WithPagingAsync(Guid id, int offset = 0, int? limit = null)
         {
             return await OneTableHandler2.ReadAllParentsInGroupAsync(
                 OneTableHandler1.ParentColumnName,
@@ -100,11 +100,23 @@ namespace Xlent.Lever.Libraries2.SqlServer
         }
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TReferenceModel1>> ReadReferencedItemsByReference2(Guid id, int offset = 0, int? limit = null)
+        public async Task<IEnumerable<TReferenceModel2>> ReadReferencedItemsByReference1Async(Guid id, int limit = int.MaxValue)
+        {
+            return await StorageHelper.ReadPages(offset => ReadReferencedItemsByReference1WithPagingAsync(id, offset));
+        }
+
+        /// <inheritdoc />
+        public async Task<PageEnvelope<TReferenceModel1>> ReadReferencedItemsByReference2WithPagingAsync(Guid id, int offset = 0, int? limit = null)
         {
             return await OneTableHandler1.ReadAllParentsInGroupAsync(
                 OneTableHandler2.ParentColumnName,
                 id, offset, limit);
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<TReferenceModel1>> ReadReferencedItemsByReference2Async(Guid id, int limit = int.MaxValue)
+        {
+            return await StorageHelper.ReadPages(offset => ReadReferencedItemsByReference2WithPagingAsync(id, offset));
         }
 
         #endregion
