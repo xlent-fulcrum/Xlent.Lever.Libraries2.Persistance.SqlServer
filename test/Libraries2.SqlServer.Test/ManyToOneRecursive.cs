@@ -19,7 +19,12 @@ namespace Libraries2.SqlServer.Test
         public void Inititalize()
         {
             var connectionString = ConfigurationManager.AppSettings["ConnectionString"];
-            var tableMetadata = new SqlTableMetadata();
+            var tableMetadata = new SqlTableMetadata
+            {
+                TableName = "TestItem",
+                CustomColumnNames = new[] { "Value", "ParentId" },
+                OrderBy = new string[] { }
+            };
             _storage = new ManyToOneRecursiveTableHandler<TestItemManyToOne<Guid, Guid?>>(connectionString, tableMetadata, "ParentId");
         }
 

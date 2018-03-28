@@ -59,6 +59,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CrdTestEtag.cs" />
     <Compile Include="ManyToOneRecursive.cs" />
     <Compile Include="ManyToOneTest.cs" />
     <Compile Include="CrudTestEtag.cs" />

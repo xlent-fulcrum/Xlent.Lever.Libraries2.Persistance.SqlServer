@@ -20,9 +20,20 @@ namespace Libraries2.SqlServer.Test
         public void Inititalize()
         {
             var connectionString = ConfigurationManager.AppSettings["ConnectionString"];
-            var tableMetadata = new SqlTableMetadata();
-            _oneStorage = new SimpleTableHandler<TestItemId<Guid>>(connectionString, tableMetadata);
-            _manyStorage = new ManyToOneTableHandler<TestItemManyToOne<Guid, Guid?>, TestItemId<Guid>>(connectionString, tableMetadata, "ParentId", _oneStorage);
+            var manyTableMetadata = new SqlTableMetadata
+            {
+                TableName = "TestItem",
+                CustomColumnNames = new[] { "Value", "ParentId" },
+                OrderBy = new string[] { }
+            };
+            var oneTableMetadata = new SqlTableMetadata
+            {
+                TableName = "TestItem",
+                CustomColumnNames = new[] { "Value" },
+                OrderBy = new string[] { }
+            };
+            _oneStorage = new SimpleTableHandler<TestItemId<Guid>>(connectionString, oneTableMetadata);
+            _manyStorage = new ManyToOneTableHandler<TestItemManyToOne<Guid, Guid?>, TestItemId<Guid>>(connectionString, manyTableMetadata, "ParentId", _oneStorage);
         }
 
         /// <inheritdoc />
