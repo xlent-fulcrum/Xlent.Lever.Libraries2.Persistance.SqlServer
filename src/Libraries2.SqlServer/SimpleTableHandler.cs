@@ -51,6 +51,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
             item.Id = id;
             MaybeValidate(item);
             MaybeCreateNewEtag(item);
+            MaybeUpdateTimeStamps(item, true);
             using (var db = Database.NewSqlConnection())
             {
                 var sql = SqlHelper.Create(TableMetadata);

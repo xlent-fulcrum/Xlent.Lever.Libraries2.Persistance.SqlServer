@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Xlent.Lever.Libraries2.SqlServer</id>
-    <version>1.1.2</version>
+    <version>1.1.3</version>
     <authors>XLENT Fulcrum</authors>
     <projectUrl>https://github.com/xlent-fulcrum/Xlent.Lever.Libraries2.WebApi</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -11,14 +11,14 @@
     <summary>Fulcrum library for Sql Server support.</summary>
     <copyright>Copyright ©2017 Xlent Business Integration AB</copyright>
     <releaseNotes>
-      1.1.2 BUG: Found several bugs thanks to the test cases.
+      1.1.3 BUG: Found several bugs thanks to the test cases.
       1.1.1 Implemented IManyToOne and IManyToMany interfaces.
       1.0.0 First release
     </releaseNotes>
     <tags>fulcrum lever nexus</tags>
     <dependencies>
       <group targetFramework="net46">
-        <dependency id="Xlent.Lever.Libraries2.Core.NetFramework" version="1.20.4" />
+        <dependency id="Xlent.Lever.Libraries2.Core.NetFramework" version="1.20.5" />
         <dependency id="Dapper" version="1.50.4" />
       </group>
     </dependencies>
