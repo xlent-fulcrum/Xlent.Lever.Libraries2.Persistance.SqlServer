@@ -47,7 +47,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <summary>
         /// Find all many-to-many items that has foreign key 1 set to <paramref name="id"/>.
         /// </summary>
-        public async Task<PageEnvelope<TManyToManyModel>> ReadByReference1WithPaging(Guid id, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TManyToManyModel>> ReadByReference1WithPaging(Guid id, int offset, int? limit = null)
         {
             return await OneTableHandler1.ReadChildrenWithPagingAsync(id, offset, limit);
         }
@@ -63,7 +63,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <summary>
         /// Find all many-to-many items that has foreign key 2 set to <paramref name="id"/>.
         /// </summary>
-        public async Task<PageEnvelope<TManyToManyModel>> ReadByReference2WithPaging(Guid id, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TManyToManyModel>> ReadByReference2WithPaging(Guid id, int offset, int? limit = null)
         {
             return await OneTableHandler2.ReadChildrenWithPagingAsync(id, offset, limit);
         }
@@ -92,7 +92,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         #region The referenced tables
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TReferenceModel2>> ReadReferencedItemsByReference1WithPagingAsync(Guid id, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TReferenceModel2>> ReadReferencedItemsByReference1WithPagingAsync(Guid id, int offset, int? limit = null)
         {
             return await OneTableHandler2.ReadAllParentsInGroupAsync(
                 OneTableHandler1.ParentColumnName,
@@ -106,7 +106,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         }
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TReferenceModel1>> ReadReferencedItemsByReference2WithPagingAsync(Guid id, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TReferenceModel1>> ReadReferencedItemsByReference2WithPagingAsync(Guid id, int offset, int? limit = null)
         {
             return await OneTableHandler1.ReadAllParentsInGroupAsync(
                 OneTableHandler2.ParentColumnName,

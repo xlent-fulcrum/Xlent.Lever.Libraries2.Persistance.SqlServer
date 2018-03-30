@@ -11,7 +11,7 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer
 {
-    public class ManyToOneRecursiveTableHandler<TModel> : SimpleTableHandler<TModel>, IManyToOneRecursiveRelationComplete<TModel, Guid>
+    public class ManyToOneRecursiveTableHandler<TModel> : SimpleTableHandler<TModel>, IManyToOneRelationComplete<TModel, Guid>
         where TModel : class, IUniquelyIdentifiable<Guid>
     {
         public string ParentColumnName { get; }
@@ -37,7 +37,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <param name="limit"></param>
         /// <returns></returns>
         /// <remarks>This method is here to support the <see cref="ManyToManyTableHandler{TDatabaseItem,TOneModel1,TOneModel2}."/></remarks>
-        internal async Task<PageEnvelope<TModel>> ReadAllParentsInGroupAsync(string groupColumnName, Guid groupColumnValue, int offset = 0, int? limit = null)
+        internal async Task<PageEnvelope<TModel>> ReadAllParentsInGroupAsync(string groupColumnName, Guid groupColumnValue, int offset, int? limit = null)
         {
             var selectRest = $"FROM [{TableMetadata.TableName}] AS many" +
                              $" JOIN [{TableName}] AS one ON (one.Id = many.[{ParentColumnName}])" +
@@ -46,7 +46,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         }
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TModel>> ReadChildrenWithPagingAsync(Guid parentId, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TModel>> ReadChildrenWithPagingAsync(Guid parentId, int offset, int? limit = null)
         {
             return await SearchWhereAsync($"[{ParentColumnName}] = @ParentId", null, new { ParentId = parentId }, offset, limit);
         }

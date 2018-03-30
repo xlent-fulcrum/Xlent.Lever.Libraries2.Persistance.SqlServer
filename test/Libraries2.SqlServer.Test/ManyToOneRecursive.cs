@@ -13,7 +13,7 @@ namespace Libraries2.SqlServer.Test
     [TestClass]
     public class ManyToOneRecursive : TestIManyToOneRecursive<Guid, Guid?>
     {
-        private IManyToOneRecursiveRelationComplete<TestItemManyToOne<Guid, Guid?>, Guid> _storage;
+        private IManyToOneRelationComplete<TestItemManyToOne<Guid, Guid?>, Guid> _storage;
 
         [TestInitialize]
         public void Inititalize()
@@ -29,11 +29,11 @@ namespace Libraries2.SqlServer.Test
         }
 
         /// <inheritdoc />
-        protected override IManyToOneRecursiveRelationComplete<TestItemManyToOne<Guid, Guid?>, Guid>
+        protected override IManyToOneRelationComplete<TestItemManyToOne<Guid, Guid?>, Guid>
             ManyStorageRecursive => _storage;
 
         /// <inheritdoc />
-        protected override IManyToOneRelationComplete<TestItemManyToOne<Guid, Guid?>, TestItemId<Guid>, Guid>
+        protected override IManyToOneRelationComplete<TestItemManyToOne<Guid, Guid?>, Guid>
             ManyStorageNonRecursive => null;
 
         /// <inheritdoc />

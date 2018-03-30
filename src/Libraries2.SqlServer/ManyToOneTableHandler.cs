@@ -8,7 +8,7 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer
 {
-    public class ManyToOneTableHandler<TManyModel, TOneModel> : ManyToOneRecursiveTableHandler<TManyModel>, IManyToOneRelationComplete<TManyModel, TOneModel, Guid>
+    public class ManyToOneTableHandler<TManyModel, TOneModel> : ManyToOneRecursiveTableHandler<TManyModel>, IManyToOneRelationComplete<TManyModel, Guid>
         where TManyModel : class, IUniquelyIdentifiable<Guid> 
         where TOneModel : IUniquelyIdentifiable<Guid>
     {
@@ -36,7 +36,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <param name="limit"></param>
         /// <returns></returns>
         /// <remarks>This method is here to support the <see cref="ManyToManyTableHandler{TDatabaseItem,TOneModel1,TOneModel2}."/></remarks>
-        internal new async Task<PageEnvelope<TOneModel>> ReadAllParentsInGroupAsync(string groupColumnName, Guid groupColumnValue, int offset = 0, int? limit = null)
+        internal new async Task<PageEnvelope<TOneModel>> ReadAllParentsInGroupAsync(string groupColumnName, Guid groupColumnValue, int offset, int? limit = null)
         {
             var selectRest = $"FROM [{TableMetadata.TableName}] AS many" +
                              $" JOIN [{OneTableHandler.TableName}] AS one ON (one.Id = many.[{ParentColumnName}])" +

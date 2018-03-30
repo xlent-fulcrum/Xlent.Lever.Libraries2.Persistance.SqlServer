@@ -69,7 +69,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
             }
         }
 
-        public override async Task<PageEnvelope<TDatabaseItem>> ReadAllWithPagingAsync(int offset = 0, int? limit = null)
+        public override async Task<PageEnvelope<TDatabaseItem>> ReadAllWithPagingAsync(int offset, int? limit = null)
         {
             return await SearchAllAsync(null, offset, limit);
         }
@@ -117,7 +117,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         #region ISearch
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TDatabaseItem>> SearchAllAsync(string orderBy, int offset = 0,
+        public async Task<PageEnvelope<TDatabaseItem>> SearchAllAsync(string orderBy, int offset,
             int? limit = null)
         {
             InternalContract.RequireGreaterThanOrEqualTo(0, offset, nameof(offset));
