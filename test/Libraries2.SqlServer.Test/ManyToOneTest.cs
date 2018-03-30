@@ -14,7 +14,7 @@ namespace Libraries2.SqlServer.Test
     public class ManyToOneTest : TestIManyToOne<Guid, Guid?>
     {
         private SimpleTableHandler<TestItemId<Guid>> _oneStorage;
-        private IManyToOneRelationComplete<TestItemManyToOne<Guid, Guid?>, TestItemId<Guid>, Guid> _manyStorage;
+        private IManyToOneRelationComplete<TestItemManyToOne<Guid, Guid?>, Guid> _manyStorage;
 
         [TestInitialize]
         public void Inititalize()
@@ -37,11 +37,11 @@ namespace Libraries2.SqlServer.Test
         }
 
         /// <inheritdoc />
-        protected override IManyToOneRecursiveRelationComplete<TestItemManyToOne<Guid, Guid?>, Guid>
+        protected override IManyToOneRelationComplete<TestItemManyToOne<Guid, Guid?>, Guid>
             ManyStorageRecursive => null;
 
         /// <inheritdoc />
-        protected override IManyToOneRelationComplete<TestItemManyToOne<Guid, Guid?>, TestItemId<Guid>, Guid>
+        protected override IManyToOneRelationComplete<TestItemManyToOne<Guid, Guid?>, Guid>
             ManyStorageNonRecursive => _manyStorage;
 
         /// <inheritdoc />

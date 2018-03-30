@@ -18,7 +18,7 @@ namespace Xlent.Lever.Libraries2.SqlServer.Logic
         /// <param name="offset">The number of items that will be skipped in result.</param>
         /// <param name="limit">The maximum number of items to return.</param>
         /// <returns>The found items.</returns>
-        Task<PageEnvelope<TDatabaseItem>> SearchAllAsync(string orderBy, int offset = 0, int? limit = null);
+        Task<PageEnvelope<TDatabaseItem>> SearchAllAsync(string orderBy, int offset, int? limit = null);
 
         /// <summary>
         /// Find the items specified by the <paramref name="where"/> clause.
