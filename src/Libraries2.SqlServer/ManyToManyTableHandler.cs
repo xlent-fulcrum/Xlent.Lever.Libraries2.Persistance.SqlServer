@@ -10,7 +10,7 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer
 {
-    public class ManyToManyTableHandler<TManyToManyModel, TReferenceModel1, TReferenceModel2> : SimpleTableHandler<TManyToManyModel>, IManyToManyRelation<TReferenceModel1, TReferenceModel2, Guid>
+    public class ManyToManyTableHandler<TManyToManyModel, TReferenceModel1, TReferenceModel2> : SimpleTableHandler<TManyToManyModel>, IManyToManyRelationComplete<TManyToManyModel, TReferenceModel1, TReferenceModel2, Guid>
         where TManyToManyModel : class, ITableItem, IValidatable
         where TReferenceModel1 : ITableItem, IValidatable
         where TReferenceModel2 : ITableItem, IValidatable
@@ -38,52 +38,43 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <summary>
         /// Get the item that has the specified <paramref name="reference1Id"/> and <paramref name="reference2Id"/>.
         /// </summary>
-        public async Task<TManyToManyModel> Read(Guid reference1Id, Guid reference2Id)
+        public async Task<TManyToManyModel> ReadAsync(Guid reference1Id, Guid reference2Id)
         {
             var param = new { Reference1Id = reference1Id, Reference2Id = reference2Id};
             return await SearchWhereSingle($"{OneTableHandler1.ParentColumnName} = @Reference1Id AND {OneTableHandler2.ParentColumnName}= @Reference2Id", param);
         }
 
-        /// <summary>
-        /// Find all many-to-many items that has foreign key 1 set to <paramref name="id"/>.
-        /// </summary>
-        public async Task<PageEnvelope<TManyToManyModel>> ReadByReference1WithPaging(Guid id, int offset, int? limit = null)
+        public async Task<PageEnvelope<TManyToManyModel>> ReadByReference1WithPagingAsync(Guid id, int offset, int? limit = null)
         {
             return await OneTableHandler1.ReadChildrenWithPagingAsync(id, offset, limit);
         }
 
-        /// <summary>
-        /// Find all many-to-many items that has foreign key 1 set to <paramref name="id"/>.
-        /// </summary>
-        public async Task<IEnumerable<TManyToManyModel>> ReadByReference1(Guid id, int limit = int.MaxValue)
+        /// <inheritdoc />
+        public async Task<IEnumerable<TManyToManyModel>> ReadByReference1Async(Guid id, int limit = int.MaxValue)
         {
-            return await StorageHelper.ReadPages(offset => ReadByReference1WithPaging(id, offset));
+            return await StorageHelper.ReadPages(offset => ReadByReference1WithPagingAsync(id, offset));
         }
 
-        /// <summary>
-        /// Find all many-to-many items that has foreign key 2 set to <paramref name="id"/>.
-        /// </summary>
-        public async Task<PageEnvelope<TManyToManyModel>> ReadByReference2WithPaging(Guid id, int offset, int? limit = null)
+        /// <inheritdoc />
+        public async Task<PageEnvelope<TManyToManyModel>> ReadByReference2WithPagingAsync(Guid id, int offset, int? limit = null)
         {
             return await OneTableHandler2.ReadChildrenWithPagingAsync(id, offset, limit);
         }
 
-        /// <summary>
-        /// Find all many-to-many items that has foreign key 1 set to <paramref name="id"/>.
-        /// </summary>
-        public async Task<IEnumerable<TManyToManyModel>> ReadByReference2(Guid id, int limit = int.MaxValue)
+        /// <inheritdoc />
+        public async Task<IEnumerable<TManyToManyModel>> ReadByReference2Async(Guid id, int limit = int.MaxValue)
         {
-            return await StorageHelper.ReadPages(offset => ReadByReference2WithPaging(id, offset));
+            return await StorageHelper.ReadPages(offset => ReadByReference2WithPagingAsync(id, offset));
         }
 
         /// <inheritdoc />
-        public async Task DeleteReferencesByReference1(Guid id)
+        public async Task DeleteByReference1Async(Guid id)
         {
             await OneTableHandler1.DeleteChildrenAsync(id);
         }
 
         /// <inheritdoc />
-        public async Task DeleteReferencesByReference2(Guid id)
+        public async Task DeleteByReference2Async(Guid id)
         {
             await OneTableHandler2.DeleteChildrenAsync(id);
         }
@@ -117,6 +108,18 @@ namespace Xlent.Lever.Libraries2.SqlServer
         public async Task<IEnumerable<TReferenceModel1>> ReadReferencedItemsByReference2Async(Guid id, int limit = int.MaxValue)
         {
             return await StorageHelper.ReadPages(offset => ReadReferencedItemsByReference2WithPagingAsync(id, offset));
+        }
+
+        /// <inheritdoc />
+        public async Task DeleteReferencesByReference1(Guid id)
+        {
+            await OneTableHandler1.DeleteAllParentsInGroupAsync(OneTableHandler1.ParentColumnName, id);
+        }
+
+        /// <inheritdoc />
+        public async Task DeleteReferencesByReference2(Guid id)
+        {
+            await OneTableHandler1.DeleteAllParentsInGroupAsync(OneTableHandler2.ParentColumnName, id);
         }
 
         #endregion
