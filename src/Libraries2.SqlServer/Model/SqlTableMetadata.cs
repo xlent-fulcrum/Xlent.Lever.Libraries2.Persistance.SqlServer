@@ -27,7 +27,8 @@ namespace Xlent.Lever.Libraries2.SqlServer.Model
         /// <inheritdoc />
         public string GetOrderBy(string columnPrefix = null)
         {
-            var orderBy = string.Join(", ", OrderBy.Select(x => $"{columnPrefix}.{x}"));
+            var prefix = string.IsNullOrWhiteSpace(columnPrefix) ? "" : $"{columnPrefix}.";
+            var orderBy = string.Join(", ", OrderBy.Select(x => $"{prefix}{x}"));
             return string.IsNullOrWhiteSpace(orderBy) ? null : orderBy;
         }
 
