@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Dapper;
-using Xlent.Lever.Libraries2.Core.Storage.Model;
 using Xlent.Lever.Libraries2.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer.Logic
@@ -19,7 +17,7 @@ namespace Xlent.Lever.Libraries2.SqlServer.Logic
 
         public static string Update(ISqlTableMetadata tableMetadata) => $"UPDATE [{tableMetadata.TableName}] SET {UpdateList(tableMetadata)} WHERE Id = @Id";
 
-        public static string DeleteBasedOnColumnValue(ISqlTableMetadata tableMetadata, string columnName, string variableName = null) => $"DELETE FROM [{tableMetadata.TableName}] WHERE {columnName} = @{variableName ?? columnName}";
+        public static string Delete(ISqlTableMetadata tableMetadata, string where) => $"DELETE FROM [{tableMetadata.TableName}] WHERE {where}";
 
         public static string ColumnList(ISqlTableMetadata tableMetadata) => string.Join(", ", AllColumnNames(tableMetadata).Select(name => $"[{name}]"));
 

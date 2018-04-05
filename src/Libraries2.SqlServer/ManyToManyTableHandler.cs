@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Xlent.Lever.Libraries2.Core.Assert;
@@ -38,88 +39,88 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <summary>
         /// Get the item that has the specified <paramref name="reference1Id"/> and <paramref name="reference2Id"/>.
         /// </summary>
-        public async Task<TManyToManyModel> ReadAsync(Guid reference1Id, Guid reference2Id)
+        public async Task<TManyToManyModel> ReadAsync(Guid reference1Id, Guid reference2Id, CancellationToken token = default(CancellationToken))
         {
             var param = new { Reference1Id = reference1Id, Reference2Id = reference2Id};
-            return await SearchWhereSingle($"{OneTableHandler1.ParentColumnName} = @Reference1Id AND {OneTableHandler2.ParentColumnName}= @Reference2Id", param);
+            return await SearchWhereSingle($"{OneTableHandler1.ParentColumnName} = @Reference1Id AND {OneTableHandler2.ParentColumnName}= @Reference2Id", param, token);
         }
 
-        public async Task<PageEnvelope<TManyToManyModel>> ReadByReference1WithPagingAsync(Guid id, int offset, int? limit = null)
+        public async Task<PageEnvelope<TManyToManyModel>> ReadByReference1WithPagingAsync(Guid id, int offset, int? limit = null, CancellationToken token = default(CancellationToken))
         {
-            return await OneTableHandler1.ReadChildrenWithPagingAsync(id, offset, limit);
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<TManyToManyModel>> ReadByReference1Async(Guid id, int limit = int.MaxValue)
-        {
-            return await StorageHelper.ReadPages(offset => ReadByReference1WithPagingAsync(id, offset));
+            return await OneTableHandler1.ReadChildrenWithPagingAsync(id, offset, limit, token);
         }
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TManyToManyModel>> ReadByReference2WithPagingAsync(Guid id, int offset, int? limit = null)
+        public async Task<IEnumerable<TManyToManyModel>> ReadByReference1Async(Guid id, int limit = int.MaxValue, CancellationToken token = default(CancellationToken))
         {
-            return await OneTableHandler2.ReadChildrenWithPagingAsync(id, offset, limit);
+            return await StorageHelper.ReadPagesAsync((offset, t) => ReadByReference1WithPagingAsync(id, offset, null, t), limit, token);
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TManyToManyModel>> ReadByReference2Async(Guid id, int limit = int.MaxValue)
+        public async Task<PageEnvelope<TManyToManyModel>> ReadByReference2WithPagingAsync(Guid id, int offset, int? limit = null, CancellationToken token = default(CancellationToken))
         {
-            return await StorageHelper.ReadPages(offset => ReadByReference2WithPagingAsync(id, offset));
+            return await OneTableHandler2.ReadChildrenWithPagingAsync(id, offset, limit, token);
         }
 
         /// <inheritdoc />
-        public async Task DeleteByReference1Async(Guid id)
+        public async Task<IEnumerable<TManyToManyModel>> ReadByReference2Async(Guid id, int limit = int.MaxValue, CancellationToken token = default(CancellationToken))
         {
-            await OneTableHandler1.DeleteChildrenAsync(id);
+            return await StorageHelper.ReadPagesAsync((offset, t) => ReadByReference2WithPagingAsync(id, offset, null, t), limit, token);
         }
 
         /// <inheritdoc />
-        public async Task DeleteByReference2Async(Guid id)
+        public async Task DeleteByReference1Async(Guid id, CancellationToken token = default(CancellationToken))
         {
-            await OneTableHandler2.DeleteChildrenAsync(id);
+            await OneTableHandler1.DeleteChildrenAsync(id, token);
+        }
+
+        /// <inheritdoc />
+        public async Task DeleteByReference2Async(Guid id, CancellationToken token = default(CancellationToken))
+        {
+            await OneTableHandler2.DeleteChildrenAsync(id, token);
         }
         #endregion
 
         #region The referenced tables
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TReferenceModel2>> ReadReferencedItemsByReference1WithPagingAsync(Guid id, int offset, int? limit = null)
+        public async Task<PageEnvelope<TReferenceModel2>> ReadReferencedItemsByReference1WithPagingAsync(Guid id, int offset, int? limit = null, CancellationToken token = default(CancellationToken))
         {
             return await OneTableHandler2.ReadAllParentsInGroupAsync(
                 OneTableHandler1.ParentColumnName,
-                id, offset, limit);
+                id, offset, limit, token);
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TReferenceModel2>> ReadReferencedItemsByReference1Async(Guid id, int limit = int.MaxValue)
+        public async Task<IEnumerable<TReferenceModel2>> ReadReferencedItemsByReference1Async(Guid id, int limit = int.MaxValue, CancellationToken token = default(CancellationToken))
         {
-            return await StorageHelper.ReadPages(offset => ReadReferencedItemsByReference1WithPagingAsync(id, offset));
+            return await StorageHelper.ReadPagesAsync((offset, t) => ReadReferencedItemsByReference1WithPagingAsync(id, offset, null, t), limit, token);
         }
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TReferenceModel1>> ReadReferencedItemsByReference2WithPagingAsync(Guid id, int offset, int? limit = null)
+        public async Task<PageEnvelope<TReferenceModel1>> ReadReferencedItemsByReference2WithPagingAsync(Guid id, int offset, int? limit = null, CancellationToken token = default(CancellationToken))
         {
             return await OneTableHandler1.ReadAllParentsInGroupAsync(
                 OneTableHandler2.ParentColumnName,
-                id, offset, limit);
+                id, offset, limit, token);
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TReferenceModel1>> ReadReferencedItemsByReference2Async(Guid id, int limit = int.MaxValue)
+        public async Task<IEnumerable<TReferenceModel1>> ReadReferencedItemsByReference2Async(Guid id, int limit = int.MaxValue, CancellationToken token = default(CancellationToken))
         {
-            return await StorageHelper.ReadPages(offset => ReadReferencedItemsByReference2WithPagingAsync(id, offset));
+            return await StorageHelper.ReadPagesAsync((offset, t) => ReadReferencedItemsByReference2WithPagingAsync(id, offset, null, t), limit, token);
         }
 
         /// <inheritdoc />
-        public async Task DeleteReferencesByReference1(Guid id)
+        public async Task DeleteReferencesByReference1(Guid id, CancellationToken token = default(CancellationToken))
         {
-            await OneTableHandler1.DeleteAllParentsInGroupAsync(OneTableHandler1.ParentColumnName, id);
+            await OneTableHandler1.DeleteAllParentsInGroupAsync(OneTableHandler1.ParentColumnName, id, token);
         }
 
         /// <inheritdoc />
-        public async Task DeleteReferencesByReference2(Guid id)
+        public async Task DeleteReferencesByReference2(Guid id, CancellationToken token = default(CancellationToken))
         {
-            await OneTableHandler1.DeleteAllParentsInGroupAsync(OneTableHandler2.ParentColumnName, id);
+            await OneTableHandler1.DeleteAllParentsInGroupAsync(OneTableHandler2.ParentColumnName, id, token);
         }
 
         #endregion

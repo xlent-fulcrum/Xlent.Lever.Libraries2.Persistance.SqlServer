@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Xlent.Lever.Libraries2.Core.Assert;
 using Xlent.Lever.Libraries2.Core.Storage.Model;
@@ -28,12 +29,12 @@ namespace Xlent.Lever.Libraries2.SqlServer
             ForeignHandler = foreignHandler;
         }
 
-        public async Task<PageEnvelope<TForeignItem>> ReadForeignAsync(Guid groupValue, int offset, int? limit = null)
+        public async Task<PageEnvelope<TForeignItem>> ReadForeignAsync(Guid groupValue, int offset, int? limit = null, CancellationToken token = default(CancellationToken))
         {
             var selectRest = $"FROM [{TableMetadata.TableName}] AS local" +
                              $" JOIN [{ForeignHandler.TableName}] AS foregin ON (foreign.Id = local.{GroupColumnName})" +
                              $" WHERE local.[{GroupColumnName}] = @GroupValue";
-            return await ForeignHandler.SearchAdvancedAsync("SELECT COUNT(foreign.[Id])", "SELECT foreign.*", selectRest, TableMetadata.GetOrderBy("local."), new { GroupValue = groupValue }, offset, limit);
+            return await ForeignHandler.SearchAdvancedAsync("SELECT COUNT(foreign.[Id])", "SELECT foreign.*", selectRest, TableMetadata.GetOrderBy("local."), new { GroupValue = groupValue }, offset, limit, token);
         }
     }
 }

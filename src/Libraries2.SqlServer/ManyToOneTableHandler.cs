@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Xlent.Lever.Libraries2.Core.Assert;
@@ -38,14 +39,15 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <param name="groupColumnValue"></param>
         /// <param name="offset"></param>
         /// <param name="limit"></param>
+        /// <param name="token">Propagates notification that operations should be canceled</param>
         /// <returns></returns>
         /// <remarks>This method is here to support the <see cref="ManyToManyTableHandler{TDatabaseItem,TOneModel1,TOneModel2}."/></remarks>
-        internal async Task<PageEnvelope<TOneModel>> ReadAllParentsInGroupAsync(string groupColumnName, Guid groupColumnValue, int offset, int? limit = null)
+        internal async Task<PageEnvelope<TOneModel>> ReadAllParentsInGroupAsync(string groupColumnName, Guid groupColumnValue, int offset, int? limit = null, CancellationToken token = default(CancellationToken))
         {
             var selectRest = $"FROM [{TableMetadata.TableName}] AS many" +
                              $" JOIN [{OneTableHandler.TableName}] AS one ON (one.Id = many.[{ParentColumnName}])" +
                              $" WHERE [{groupColumnName}] = @ColumnValue";
-            return await OneTableHandler.SearchAdvancedAsync("SELECT COUNT(one.[Id])", "SELECT one.*", selectRest, TableMetadata.GetOrderBy("many."), new { ColumnValue = groupColumnValue }, offset, limit);
+            return await OneTableHandler.SearchAdvancedAsync("SELECT COUNT(one.[Id])", "SELECT one.*", selectRest, TableMetadata.GetOrderBy("many."), new { ColumnValue = groupColumnValue }, offset, limit, token);
         }
 
         /// <summary>
@@ -53,41 +55,34 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// </summary>
         /// <param name="groupColumnName"></param>
         /// <param name="groupColumnValue"></param>
-        /// <param name="offset"></param>
-        /// <param name="limit"></param>
+        /// <param name="token">Propagates notification that operations should be canceled</param>
         /// <returns></returns>
         /// <remarks>This method is here to support the <see cref="ManyToManyTableHandler{TDatabaseItem,TOneModel1,TOneModel2}."/></remarks>
-        internal async Task<PageEnvelope<TOneModel>> DeleteAllParentsInGroupAsync(string groupColumnName, Guid groupColumnValue)
+        internal async Task DeleteAllParentsInGroupAsync(string groupColumnName, Guid groupColumnValue, CancellationToken token)
         {
-            var selectRest = $"FROM [{TableMetadata.TableName}] AS many" +
+            var deleteStatement = "DELETE one" +
+                             $" FROM [{TableMetadata.TableName}] AS many" +
                              $" JOIN [{OneTableHandler.TableName}] AS one ON (one.Id = many.[{ParentColumnName}])" +
                              $" WHERE [{groupColumnName}] = @ColumnValue";
-            return await OneTableHandler.SearchAdvancedAsync("SELECT COUNT(one.[Id])", "DELETE one", selectRest, "1", new { ColumnValue = groupColumnValue });
+            await OneTableHandler.ExecuteAsync(deleteStatement, new { ColumnValue = groupColumnValue }, token);
         }
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TManyModel>> ReadChildrenWithPagingAsync(Guid parentId, int offset, int? limit = null)
+        public async Task<PageEnvelope<TManyModel>> ReadChildrenWithPagingAsync(Guid parentId, int offset, int? limit = null, CancellationToken token = default(CancellationToken))
         {
-            return await SearchWhereAsync($"[{ParentColumnName}] = @ParentId", null, new { ParentId = parentId }, offset, limit);
+            return await SearchWhereAsync($"[{ParentColumnName}] = @ParentId", null, new { ParentId = parentId }, offset, limit, token);
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TManyModel>> ReadChildrenAsync(Guid parentId, int limit = int.MaxValue)
+        public async Task<IEnumerable<TManyModel>> ReadChildrenAsync(Guid parentId, int limit = int.MaxValue, CancellationToken token = default(CancellationToken))
         {
-            return await StorageHelper.ReadPages(offset => ReadChildrenWithPagingAsync(parentId, offset));
+            return await StorageHelper.ReadPagesAsync((offset, t)=> ReadChildrenWithPagingAsync(parentId, offset, null, t), limit, token);
         }
 
         /// <inheritdoc />
-        public async Task DeleteChildrenAsync(Guid parentId)
+        public async Task DeleteChildrenAsync(Guid parentId, CancellationToken token = default(CancellationToken))
         {
-            using (IDbConnection db = Database.NewSqlConnection())
-            {
-                var sqlQuery = "DELETE" +
-                               $" FROM [{TableMetadata.TableName}]" +
-                               $" WHERE [{ParentColumnName}] = @ParentId";
-
-                await db.ExecuteAsync(sqlQuery, new { ParentId = parentId});
-            }
+            await DeleteWhereAsync("[{ParentColumnName}] = @ParentId", new { ParentId = parentId }, token);
         }
     }
 }

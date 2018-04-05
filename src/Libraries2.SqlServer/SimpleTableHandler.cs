@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Xlent.Lever.Libraries2.Core.Assert;
@@ -44,7 +45,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
     where TDatabaseItem : IUniquelyIdentifiable<Guid>
     {
         /// <inheritdoc />
-        public override async Task CreateWithSpecifiedIdAsync(Guid id, TDatabaseItem item)
+        public override async Task CreateWithSpecifiedIdAsync(Guid id, TDatabaseItem item, CancellationToken token = default(CancellationToken))
         {
             InternalContract.RequireNotDefaultValue(id, nameof(id));
             InternalContract.RequireNotNull(item, nameof(item));
@@ -60,40 +61,61 @@ namespace Xlent.Lever.Libraries2.SqlServer
         }
 
         /// <inheritdoc />
-        public override async Task DeleteAsync(Guid id)
+        public override async Task DeleteAsync(Guid id, CancellationToken token = default(CancellationToken))
         {
             InternalContract.RequireNotDefaultValue(id, nameof(id));
+            await DeleteWhereAsync("Id=@Id", new { Id = id }, token);
+        }
+
+        /// <inheritdoc />
+        public override async Task DeleteAllAsync(CancellationToken token = default(CancellationToken))
+        {
+            await DeleteWhereAsync("1=1", null, token);
+        }
+
+        protected async Task DeleteWhereAsync(string where = null, object param = null, CancellationToken token = default(CancellationToken))
+        {
+            where = string.IsNullOrWhiteSpace(where) ? "1=1" : where;
             using (var db = Database.NewSqlConnection())
             {
-                await db.ExecuteAsync(SqlHelper.DeleteBasedOnColumnValue(TableMetadata, "Id"), new { Id = id });
+                await db.ExecuteAsync(SqlHelper.Delete(TableMetadata, where), param);
             }
         }
 
-        public override async Task<PageEnvelope<TDatabaseItem>> ReadAllWithPagingAsync(int offset, int? limit = null)
+        protected internal async Task ExecuteAsync(string statement, object param = null, CancellationToken token = default(CancellationToken))
         {
-            return await SearchAllAsync(null, offset, limit);
+            InternalContract.RequireNotNullOrWhitespace(statement, nameof(statement));
+            using (var db = Database.NewSqlConnection())
+            {
+                await db.ExecuteAsync(statement, param);
+            }
+        }
+
+        public override async Task<PageEnvelope<TDatabaseItem>> ReadAllWithPagingAsync(int offset, int? limit = null, CancellationToken token = default(CancellationToken))
+        {
+            return await SearchAllAsync(null, offset, limit, token);
         }
 
         /// <inheritdoc />
-        public override async Task<TDatabaseItem> ReadAsync(Guid id)
+        public override async Task<TDatabaseItem> ReadAsync(Guid id, CancellationToken token = default(CancellationToken))
         {
             InternalContract.RequireNotDefaultValue(id, nameof(id));
-            return await SearchWhereSingle("Id = @Id", new { Id = id });
+            return await SearchWhereSingle("Id = @Id", new { Id = id }, token);
         }
 
         /// <inheritdoc />
-        public override async Task UpdateAsync(Guid id, TDatabaseItem item)
+        public override async Task UpdateAsync(Guid id, TDatabaseItem item, CancellationToken token = default(CancellationToken))
         {
             InternalContract.RequireNotNull(item, nameof(item));
             MaybeValidate(item);
-            await InternalUpdateAsync(id, item);
+            await InternalUpdateAsync(id, item, token);
         }
 
-        private async Task InternalUpdateAsync(Guid id, TDatabaseItem item)
+        private async Task InternalUpdateAsync(Guid id, TDatabaseItem item, CancellationToken token)
         {
             InternalContract.RequireNotNull(item, nameof(item));
             MaybeValidate(item);
-            await MaybeVerifyEtagForUpdateAsync(id, item);
+            await MaybeVerifyEtagForUpdateAsync(id, item, token);
             using (var db = Database.NewSqlConnection())
             {
                 if (item is IOptimisticConcurrencyControlByETag etaggable)
@@ -112,26 +134,27 @@ namespace Xlent.Lever.Libraries2.SqlServer
             }
         }
     }
+
+    #region ISearch
     public partial class SimpleTableHandler<TDatabaseItem> : ISearch<TDatabaseItem>
     {
-        #region ISearch
 
         /// <inheritdoc />
         public async Task<PageEnvelope<TDatabaseItem>> SearchAllAsync(string orderBy, int offset,
-            int? limit = null)
+            int? limit = null, CancellationToken token = default(CancellationToken))
         {
             InternalContract.RequireGreaterThanOrEqualTo(0, offset, nameof(offset));
             if (limit != null) InternalContract.RequireGreaterThanOrEqualTo(0, limit.Value, nameof(limit));
-            return await SearchWhereAsync(null, orderBy, null, offset, limit);
+            return await SearchWhereAsync(null, orderBy, null, offset, limit, token);
         }
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TDatabaseItem>> SearchAdvancedAsync(string countFirst, string selectFirst, string selectRest, string orderBy = null, object param = null, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TDatabaseItem>> SearchAdvancedAsync(string countFirst, string selectFirst, string selectRest, string orderBy = null, object param = null, int offset = 0, int? limit = null, CancellationToken token = default(CancellationToken))
         {
             limit = limit ?? PageInfo.DefaultLimit;
             InternalContract.RequireGreaterThanOrEqualTo(0, offset, nameof(offset));
             InternalContract.RequireGreaterThanOrEqualTo(0, limit.Value, nameof(limit));
-            var total = CountItemsAdvanced(countFirst, selectRest, param);
+            var total = await CountItemsAdvancedAsync(countFirst, selectRest, param, token);
             var selectStatement = selectRest == null ? null : $"{selectFirst} {selectRest}";
             var data = await SearchInternalAsync(param, selectStatement, orderBy, offset, limit.Value);
             var dataAsArray = data as TDatabaseItem[] ?? data.ToArray();
@@ -150,12 +173,12 @@ namespace Xlent.Lever.Libraries2.SqlServer
         }
 
         /// <inheritdoc />
-        public async Task<PageEnvelope<TDatabaseItem>> SearchWhereAsync(string where = null, string orderBy = null, object param = null, int offset = 0, int? limit = null)
+        public async Task<PageEnvelope<TDatabaseItem>> SearchWhereAsync(string where = null, string orderBy = null, object param = null, int offset = 0, int? limit = null, CancellationToken token = default(CancellationToken))
         {
             limit = limit ?? PageInfo.DefaultLimit;
             InternalContract.RequireGreaterThanOrEqualTo(0, offset, nameof(offset));
             InternalContract.RequireGreaterThanOrEqualTo(0, limit.Value, nameof(limit));
-            var total = CountItemsWhere(where, param);
+            var total = await CountItemsWhereAsync(where, param, token);
             var data = await SearchInternalWhereAsync(param, where, orderBy, offset, limit.Value);
             var dataAsArray = data as TDatabaseItem[] ?? data.ToArray();
             return new PageEnvelope<TDatabaseItem>
@@ -173,28 +196,28 @@ namespace Xlent.Lever.Libraries2.SqlServer
         }
 
         /// <inheritdoc />
-        public async Task<TDatabaseItem> SearchWhereSingle(string where, object param = null)
+        public async Task<TDatabaseItem> SearchWhereSingle(string where, object param = null, CancellationToken token = default(CancellationToken))
         {
             if (where == null) where = "1=1";
-            return await SearchAdvancedSingleAsync($"SELECT * FROM [{TableMetadata.TableName}] WHERE ({where})", param);
+            return await SearchAdvancedSingleAsync($"SELECT * FROM [{TableMetadata.TableName}] WHERE ({where})", param, token);
         }
 
         /// <inheritdoc />
-        public async Task<TDatabaseItem> SearchAdvancedSingleAsync(string selectStatement, object param = null)
+        public async Task<TDatabaseItem> SearchAdvancedSingleAsync(string selectStatement, object param = null, CancellationToken token = default(CancellationToken))
         {
             InternalContract.RequireNotNullOrWhitespace(selectStatement, nameof(selectStatement));
-            return await SearchFirstAdvancedAsync(selectStatement, null, param);
+            return await SearchFirstAdvancedAsync(selectStatement, null, param, token);
         }
 
         /// <inheritdoc />
-        public async Task<TDatabaseItem> SearchFirstWhereAsync(string where = null, string orderBy = null, object param = null)
+        public async Task<TDatabaseItem> SearchFirstWhereAsync(string where = null, string orderBy = null, object param = null, CancellationToken token = default(CancellationToken))
         {
             var result = await SearchInternalWhereAsync(param, where, orderBy, 0, 1);
             return result.SingleOrDefault();
         }
 
         /// <inheritdoc />
-        public async Task<TDatabaseItem> SearchFirstAdvancedAsync(string selectStatement, string orderBy = null, object param = null)
+        public async Task<TDatabaseItem> SearchFirstAdvancedAsync(string selectStatement, string orderBy = null, object param = null, CancellationToken token = default(CancellationToken))
         {
             InternalContract.RequireNotNullOrWhitespace(selectStatement, nameof(selectStatement));
             var result = await SearchInternalAsync(param, selectStatement, orderBy, 0, 1);
@@ -202,14 +225,14 @@ namespace Xlent.Lever.Libraries2.SqlServer
         }
 
         /// <inheritdoc />
-        public int CountItemsWhere(string where = null, object param = null)
+        public async Task<int> CountItemsWhereAsync(string where = null, object param = null, CancellationToken token = default(CancellationToken))
         {
             where = where ?? "1=1";
-            return CountItemsAdvanced("SELECT COUNT(*)", $"FROM [{TableMetadata.TableName}] WHERE ({where})", param);
+            return await CountItemsAdvancedAsync("SELECT COUNT(*)", $"FROM [{TableMetadata.TableName}] WHERE ({@where})", param, token);
         }
 
         /// <inheritdoc />
-        public int CountItemsAdvanced(string selectFirst, string selectRest, object param)
+        public async Task<int> CountItemsAdvancedAsync(string selectFirst, string selectRest, object param = null, CancellationToken token = default(CancellationToken))
         {
             InternalContract.RequireNotNullOrWhitespace(selectFirst, nameof(selectFirst));
             InternalContract.RequireNotNullOrWhitespace(selectRest, nameof(selectRest));
@@ -217,7 +240,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
             var selectStatement = $"{selectFirst} {selectRest}";
             using (IDbConnection db = Database.NewSqlConnection())
             {
-                return db.Query<int>(selectStatement, param)
+                return (await db.QueryAsync<int>(selectStatement, param))
                     .SingleOrDefault();
             }
         }
@@ -266,6 +289,6 @@ namespace Xlent.Lever.Libraries2.SqlServer
                 return await db.QueryAsync<TDatabaseItem>(sqlQuery, param);
             }
         }
-        #endregion
     }
+    #endregion
 }
