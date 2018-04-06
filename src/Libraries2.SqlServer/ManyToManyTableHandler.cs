@@ -112,13 +112,13 @@ namespace Xlent.Lever.Libraries2.SqlServer
         }
 
         /// <inheritdoc />
-        public async Task DeleteReferencesByReference1(Guid id, CancellationToken token = default(CancellationToken))
+        public async Task DeleteReferencedItemsByReference1(Guid id, CancellationToken token = default(CancellationToken))
         {
             await OneTableHandler1.DeleteAllParentsInGroupAsync(OneTableHandler1.ParentColumnName, id, token);
         }
 
         /// <inheritdoc />
-        public async Task DeleteReferencesByReference2(Guid id, CancellationToken token = default(CancellationToken))
+        public async Task DeleteReferencedItemsByReference2(Guid id, CancellationToken token = default(CancellationToken))
         {
             await OneTableHandler1.DeleteAllParentsInGroupAsync(OneTableHandler2.ParentColumnName, id, token);
         }
