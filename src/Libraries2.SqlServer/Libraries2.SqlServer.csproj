@@ -49,7 +49,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CrudTable.cs" />
+    <Compile Include="CrudSql.cs" />
     <Compile Include="ManyToManySql.cs" />
     <Compile Include="ManyToOneSql.cs" />
     <Compile Include="DoubleForeignTableHandler.cs" />

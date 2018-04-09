@@ -12,11 +12,11 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer
 {
-    public class ManyToOneSql<TManyModel, TOneModel> : CrudTable<TManyModel>, IManyToOneRelationComplete<TManyModel, Guid>
+    public class ManyToOneSql<TManyModel, TOneModel> : CrudSql<TManyModel>, IManyToOneRelationComplete<TManyModel, Guid>
         where TManyModel : class, IUniquelyIdentifiable<Guid> where TOneModel : IUniquelyIdentifiable<Guid>
     {
         public string ParentColumnName { get; }
-        protected CrudTable<TOneModel> OneTableHandler { get; }
+        protected CrudSql<TOneModel> OneTableHandler { get; }
 
         /// <summary>
         /// Constructor
@@ -25,7 +25,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <param name="tableMetadata"></param>
         /// <param name="parentColumnName"></param>
         /// <param name="oneTableHandler"></param>
-        public ManyToOneSql(string connectionString, ISqlTableMetadata tableMetadata, string parentColumnName, CrudTable<TOneModel> oneTableHandler)
+        public ManyToOneSql(string connectionString, ISqlTableMetadata tableMetadata, string parentColumnName, CrudSql<TOneModel> oneTableHandler)
             : base(connectionString, tableMetadata)
         {
             ParentColumnName = parentColumnName;

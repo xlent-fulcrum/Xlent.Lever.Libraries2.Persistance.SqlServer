@@ -18,7 +18,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
     /// Helper class for advanced SELECT statmements
     /// </summary>
     /// <typeparam name="TDatabaseItem"></typeparam>
-    public class CrudTable<TDatabaseItem> : TableBase<TDatabaseItem>, ICrud<TDatabaseItem, Guid>
+    public class CrudSql<TDatabaseItem> : TableBase<TDatabaseItem>, ICrud<TDatabaseItem, Guid>
         where TDatabaseItem : IUniquelyIdentifiable<Guid>
     {
         /// <summary>
@@ -26,7 +26,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// </summary>
         /// <param name="connectionString"></param>
         /// <param name="tableMetadata"></param>
-        public CrudTable(string connectionString, ISqlTableMetadata tableMetadata)
+        public CrudSql(string connectionString, ISqlTableMetadata tableMetadata)
         :base(connectionString, tableMetadata)
         {
             InternalContract.RequireValidated(tableMetadata, nameof(tableMetadata));

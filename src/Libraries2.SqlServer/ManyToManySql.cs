@@ -11,7 +11,7 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer
 {
-    public class ManyToManySql<TManyToManyModel, TReferenceModel1, TReferenceModel2> : CrudTable<TManyToManyModel>, IManyToManyRelationComplete<TManyToManyModel, TReferenceModel1, TReferenceModel2, Guid>
+    public class ManyToManySql<TManyToManyModel, TReferenceModel1, TReferenceModel2> : CrudSql<TManyToManyModel>, IManyToManyRelationComplete<TManyToManyModel, TReferenceModel1, TReferenceModel2, Guid>
         where TManyToManyModel : class, ITableItem, IValidatable
         where TReferenceModel1 : ITableItem, IValidatable
         where TReferenceModel2 : ITableItem, IValidatable
@@ -28,7 +28,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <param name="referenceHandler1"></param>
         /// <param name="groupColumnName2"></param>
         /// <param name="referenceHandler2"></param>
-        public ManyToManySql(string connectionString, ISqlTableMetadata tableMetadata, string groupColumnName1, CrudTable<TReferenceModel1> referenceHandler1, string groupColumnName2, CrudTable<TReferenceModel2> referenceHandler2)
+        public ManyToManySql(string connectionString, ISqlTableMetadata tableMetadata, string groupColumnName1, CrudSql<TReferenceModel1> referenceHandler1, string groupColumnName2, CrudSql<TReferenceModel2> referenceHandler2)
             : base(connectionString, tableMetadata)
         {
             OneTableHandler1 = new ManyToOneSql<TManyToManyModel, TReferenceModel1>(connectionString, tableMetadata, groupColumnName1, referenceHandler1);

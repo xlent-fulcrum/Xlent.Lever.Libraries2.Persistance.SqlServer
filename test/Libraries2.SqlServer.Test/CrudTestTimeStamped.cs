@@ -13,7 +13,7 @@ namespace Libraries2.SqlServer.Test
     [TestClass]
     public class CrudTestTimeStamped : TestICrudTimeStamped<Guid>
     {
-        private CrudTable<TestItemTimestamped<Guid>> _storage;
+        private CrudSql<TestItemTimestamped<Guid>> _storage;
 
         [TestInitialize]
         public void Inititalize()
@@ -28,7 +28,7 @@ namespace Libraries2.SqlServer.Test
                 CustomColumnNames = new[] { "Value" },
                 OrderBy = new string[] { }
             };
-            _storage = new CrudTable<TestItemTimestamped<Guid>>(connectionString, tableMetadata);
+            _storage = new CrudSql<TestItemTimestamped<Guid>>(connectionString, tableMetadata);
         }
 
         protected override ICrud<TestItemTimestamped<Guid>, Guid> CrudStorage => _storage;
