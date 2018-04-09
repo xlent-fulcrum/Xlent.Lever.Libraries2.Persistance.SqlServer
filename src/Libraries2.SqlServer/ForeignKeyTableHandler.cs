@@ -7,13 +7,13 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer
 {
-    [Obsolete("Use ManyToOneTableHandler.")]
-    public class ForeignKeyTableHandler<TLocalItem, TForeignItem> : SimpleTableHandler<TLocalItem>
+    [Obsolete("Use ManyToOneSql.")]
+    public class ForeignKeyTableHandler<TLocalItem, TForeignItem> : TableBase<TLocalItem>
         where TLocalItem : ITableItem, IValidatable
         where TForeignItem : ITableItem, IValidatable
     {
         public string GroupColumnName { get; }
-        public SimpleTableHandler<TForeignItem> ForeignHandler { get; }
+        public TableBase<TForeignItem> ForeignHandler { get; }
 
         /// <summary>
         /// Constructor
@@ -22,7 +22,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <param name="tableMetadata"></param>
         /// <param name="groupColumnName"></param>
         /// <param name="foreignHandler"></param>
-        public ForeignKeyTableHandler(string connectionString, ISqlTableMetadata tableMetadata, string groupColumnName, SimpleTableHandler<TForeignItem> foreignHandler)
+        public ForeignKeyTableHandler(string connectionString, ISqlTableMetadata tableMetadata, string groupColumnName, TableBase<TForeignItem> foreignHandler)
             : base(connectionString, tableMetadata)
         {
             GroupColumnName = groupColumnName;

@@ -11,13 +11,13 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer
 {
-    public class ManyToManyTableHandler<TManyToManyModel, TReferenceModel1, TReferenceModel2> : SimpleTableHandler<TManyToManyModel>, IManyToManyRelationComplete<TManyToManyModel, TReferenceModel1, TReferenceModel2, Guid>
+    public class ManyToManySql<TManyToManyModel, TReferenceModel1, TReferenceModel2> : CrudTable<TManyToManyModel>, IManyToManyRelationComplete<TManyToManyModel, TReferenceModel1, TReferenceModel2, Guid>
         where TManyToManyModel : class, ITableItem, IValidatable
         where TReferenceModel1 : ITableItem, IValidatable
         where TReferenceModel2 : ITableItem, IValidatable
     {
-        public ManyToOneTableHandler<TManyToManyModel, TReferenceModel1> OneTableHandler1 { get; }
-        public ManyToOneTableHandler<TManyToManyModel, TReferenceModel2> OneTableHandler2 { get; }
+        public ManyToOneSql<TManyToManyModel, TReferenceModel1> OneTableHandler1 { get; }
+        public ManyToOneSql<TManyToManyModel, TReferenceModel2> OneTableHandler2 { get; }
 
         /// <summary>
         /// Constructor
@@ -28,11 +28,11 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <param name="referenceHandler1"></param>
         /// <param name="groupColumnName2"></param>
         /// <param name="referenceHandler2"></param>
-        public ManyToManyTableHandler(string connectionString, ISqlTableMetadata tableMetadata, string groupColumnName1, SimpleTableHandler<TReferenceModel1> referenceHandler1, string groupColumnName2, SimpleTableHandler<TReferenceModel2> referenceHandler2)
+        public ManyToManySql(string connectionString, ISqlTableMetadata tableMetadata, string groupColumnName1, CrudTable<TReferenceModel1> referenceHandler1, string groupColumnName2, CrudTable<TReferenceModel2> referenceHandler2)
             : base(connectionString, tableMetadata)
         {
-            OneTableHandler1 = new ManyToOneTableHandler<TManyToManyModel, TReferenceModel1>(connectionString, tableMetadata, groupColumnName1, referenceHandler1);
-            OneTableHandler2 = new ManyToOneTableHandler<TManyToManyModel, TReferenceModel2>(connectionString, tableMetadata, groupColumnName2, referenceHandler2);
+            OneTableHandler1 = new ManyToOneSql<TManyToManyModel, TReferenceModel1>(connectionString, tableMetadata, groupColumnName1, referenceHandler1);
+            OneTableHandler2 = new ManyToOneSql<TManyToManyModel, TReferenceModel2>(connectionString, tableMetadata, groupColumnName2, referenceHandler2);
         }
 
         #region The reference table (the many-to-many table)

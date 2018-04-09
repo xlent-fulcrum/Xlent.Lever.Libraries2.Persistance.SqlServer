@@ -13,7 +13,7 @@ namespace Libraries2.SqlServer.Test
     [TestClass]
     public class ManyToOneTest : TestIManyToOne<Guid, Guid?>
     {
-        private SimpleTableHandler<TestItemId<Guid>> _oneStorage;
+        private CrudTable<TestItemId<Guid>> _oneStorage;
         private IManyToOneRelationComplete<TestItemManyToOne<Guid, Guid?>, Guid> _manyStorage;
 
         [TestInitialize]
@@ -32,8 +32,8 @@ namespace Libraries2.SqlServer.Test
                 CustomColumnNames = new[] { "Value" },
                 OrderBy = new string[] { }
             };
-            _oneStorage = new SimpleTableHandler<TestItemId<Guid>>(connectionString, oneTableMetadata);
-            _manyStorage = new ManyToOneTableHandler<TestItemManyToOne<Guid, Guid?>, TestItemId<Guid>>(connectionString, manyTableMetadata, "ParentId", _oneStorage);
+            _oneStorage = new CrudTable<TestItemId<Guid>>(connectionString, oneTableMetadata);
+            _manyStorage = new ManyToOneSql<TestItemManyToOne<Guid, Guid?>, TestItemId<Guid>>(connectionString, manyTableMetadata, "ParentId", _oneStorage);
         }
 
         /// <inheritdoc />

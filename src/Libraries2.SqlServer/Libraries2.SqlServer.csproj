@@ -49,15 +49,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ManyToManyTableHandler.cs" />
-    <Compile Include="ManyToOneTableHandler.cs" />
+    <Compile Include="CrudTable.cs" />
+    <Compile Include="ManyToManySql.cs" />
+    <Compile Include="ManyToOneSql.cs" />
     <Compile Include="DoubleForeignTableHandler.cs" />
     <Compile Include="ForeignKeyTableHandler.cs" />
     <Compile Include="Logic\Database.cs" />
     <Compile Include="Logic\SqlHelper.cs" />
     <Compile Include="Logic\ISearch.cs" />
     <Compile Include="Model\SqlTableMetadata.cs" />
-    <Compile Include="SimpleTableHandler.cs" />
+    <Compile Include="TableBase.cs" />
     <Compile Include="Model\ISqlTableMetadata.cs" />
     <Compile Include="Model\ITableItem.cs" />
     <Compile Include="Model\TableItem.cs" />
@@ -70,9 +71,7 @@
     <None Include="packages.config" />
     <None Include="Xlent.Lever.Libraries2.SqlServer.nuspec" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="MoveToCore\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>rd /s /q $(ProjectDir)lib\

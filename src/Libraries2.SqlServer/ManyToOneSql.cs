@@ -12,11 +12,11 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer
 {
-    public class ManyToOneTableHandler<TManyModel, TOneModel> : SimpleTableHandler<TManyModel>, IManyToOneRelationComplete<TManyModel, Guid>
+    public class ManyToOneSql<TManyModel, TOneModel> : CrudTable<TManyModel>, IManyToOneRelationComplete<TManyModel, Guid>
         where TManyModel : class, IUniquelyIdentifiable<Guid> where TOneModel : IUniquelyIdentifiable<Guid>
     {
         public string ParentColumnName { get; }
-        protected SimpleTableHandler<TOneModel> OneTableHandler { get; }
+        protected CrudTable<TOneModel> OneTableHandler { get; }
 
         /// <summary>
         /// Constructor
@@ -25,7 +25,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <param name="tableMetadata"></param>
         /// <param name="parentColumnName"></param>
         /// <param name="oneTableHandler"></param>
-        public ManyToOneTableHandler(string connectionString, ISqlTableMetadata tableMetadata, string parentColumnName, SimpleTableHandler<TOneModel> oneTableHandler)
+        public ManyToOneSql(string connectionString, ISqlTableMetadata tableMetadata, string parentColumnName, CrudTable<TOneModel> oneTableHandler)
             : base(connectionString, tableMetadata)
         {
             ParentColumnName = parentColumnName;
@@ -41,7 +41,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <param name="limit"></param>
         /// <param name="token">Propagates notification that operations should be canceled</param>
         /// <returns></returns>
-        /// <remarks>This method is here to support the <see cref="ManyToManyTableHandler{TDatabaseItem,TOneModel1,TOneModel2}."/></remarks>
+        /// <remarks>This method is here to support the <see cref="ManyToManySqlSql{TManyToManyModel,TReferenceModel1,TReferenceModel2}."/></remarks>
         internal async Task<PageEnvelope<TOneModel>> ReadAllParentsInGroupAsync(string groupColumnName, Guid groupColumnValue, int offset, int? limit = null, CancellationToken token = default(CancellationToken))
         {
             var selectRest = $"FROM [{TableMetadata.TableName}] AS many" +
@@ -57,7 +57,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <param name="groupColumnValue"></param>
         /// <param name="token">Propagates notification that operations should be canceled</param>
         /// <returns></returns>
-        /// <remarks>This method is here to support the <see cref="ManyToManyTableHandler{TDatabaseItem,TOneModel1,TOneModel2}."/></remarks>
+        /// <remarks>This method is here to support the <see cref="ManyToManySqlSql{TManyToManyModel,TReferenceModel1,TReferenceModel2}."/></remarks>
         internal async Task DeleteAllParentsInGroupAsync(string groupColumnName, Guid groupColumnValue, CancellationToken token)
         {
             var deleteStatement = "DELETE one" +

@@ -7,8 +7,8 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer
 {
-    [Obsolete("Use ManyToManyTableHandler.")]
-    public class DoubleForeignTableHandler<TDatabaseItem, TForeignModel1, TForeignModel2> : SimpleTableHandler<TDatabaseItem>
+    [Obsolete("Use ManyToManySql.")]
+    public class DoubleForeignTableHandler<TDatabaseItem, TForeignModel1, TForeignModel2> : TableBase<TDatabaseItem>
         where TDatabaseItem : ITableItem, IValidatable
         where TForeignModel1 : ITableItem, IValidatable
         where TForeignModel2 : ITableItem, IValidatable
@@ -25,7 +25,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <param name="foreignHandler1"></param>
         /// <param name="groupColumnName2"></param>
         /// <param name="foreignHandler2"></param>
-        public DoubleForeignTableHandler(string connectionString, ISqlTableMetadata tableMetadata, string groupColumnName1, SimpleTableHandler<TForeignModel1> foreignHandler1, string groupColumnName2, SimpleTableHandler<TForeignModel2> foreignHandler2)
+        public DoubleForeignTableHandler(string connectionString, ISqlTableMetadata tableMetadata, string groupColumnName1, TableBase<TForeignModel1> foreignHandler1, string groupColumnName2, TableBase<TForeignModel2> foreignHandler2)
             : base(connectionString, tableMetadata)
         {
             ForeignKeyTableHandler1 = new ForeignKeyTableHandler<TDatabaseItem, TForeignModel1>(connectionString, tableMetadata, groupColumnName1, foreignHandler1);
