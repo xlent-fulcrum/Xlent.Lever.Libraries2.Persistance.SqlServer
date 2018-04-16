@@ -13,7 +13,7 @@ namespace Libraries2.SqlServer.Test
     [TestClass]
     public class CrudTestValidated : TestICrudValidated<Guid>
     {
-        private CrudSql<TestItemValidated<Guid>> _storage;
+        private CrudSql<TestItemBare, TestItemValidated<Guid>> _storage;
 
         [TestInitialize]
         public void Inititalize()
@@ -26,9 +26,9 @@ namespace Libraries2.SqlServer.Test
                 CustomColumnNames = new[] { "Value" },
                 OrderBy = new string[] { }
             };
-            _storage = new CrudSql<TestItemValidated<Guid>>(connectionString, tableMetadata);
+            _storage = new CrudSql<TestItemBare, TestItemValidated<Guid>>(connectionString, tableMetadata);
         }
 
-        protected override ICrud<TestItemValidated<Guid>, Guid> CrudStorage => _storage;
+        protected override ICrud<TestItemBare, TestItemValidated<Guid>, Guid> CrudStorage => _storage;
     }
 }

@@ -10,10 +10,34 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer
 {
-    public class ManyToManySql<TManyToManyModel, TReferenceModel1, TReferenceModel2> : CrudSql<TManyToManyModel>, IManyToManyRelationComplete<TManyToManyModel, TReferenceModel1, TReferenceModel2, Guid>
+    public class ManyToManySql<TManyToManyModel, TReferenceModel1, TReferenceModel2> : ManyToManySql<TManyToManyModel, TManyToManyModel, TReferenceModel1, TReferenceModel2>,
+        ICrud<TManyToManyModel, Guid>,
+        IManyToManyRelationComplete<TManyToManyModel, TReferenceModel1, TReferenceModel2, Guid>
         where TManyToManyModel : class, ITableItem, IValidatable
         where TReferenceModel1 : ITableItem, IValidatable
         where TReferenceModel2 : ITableItem, IValidatable
+    {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="connectionString"></param>
+        /// <param name="tableMetadata"></param>
+        /// <param name="groupColumnName1"></param>
+        /// <param name="referenceHandler1"></param>
+        /// <param name="groupColumnName2"></param>
+        /// <param name="referenceHandler2"></param>
+        public ManyToManySql(string connectionString, ISqlTableMetadata tableMetadata, string groupColumnName1,
+            CrudSql<TReferenceModel1> referenceHandler1, string groupColumnName2,
+            CrudSql<TReferenceModel2> referenceHandler2)
+            : base(connectionString, tableMetadata, groupColumnName1, referenceHandler1, groupColumnName2, referenceHandler2)
+        {
+        }
+    }
+
+    public class ManyToManySql<TManyToManyModelCreate, TManyToManyModel, TReferenceModel1, TReferenceModel2> : CrudSql<TManyToManyModelCreate, TManyToManyModel>, IManyToManyRelationComplete<TManyToManyModelCreate, TManyToManyModel, TReferenceModel1, TReferenceModel2, Guid>
+            where TManyToManyModel : class, TManyToManyModelCreate, ITableItem, IValidatable, IUniquelyIdentifiable<Guid>
+            where TReferenceModel1 : ITableItem, IValidatable
+            where TReferenceModel2 : ITableItem, IValidatable
     {
         public ManyToOneSql<TManyToManyModel, TReferenceModel1> OneTableHandler1 { get; }
         public ManyToOneSql<TManyToManyModel, TReferenceModel2> OneTableHandler2 { get; }
@@ -40,7 +64,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// </summary>
         public async Task<TManyToManyModel> ReadAsync(Guid reference1Id, Guid reference2Id, CancellationToken token = default(CancellationToken))
         {
-            var param = new { Reference1Id = reference1Id, Reference2Id = reference2Id};
+            var param = new { Reference1Id = reference1Id, Reference2Id = reference2Id };
             return await SearchWhereSingle($"{OneTableHandler1.ParentColumnName} = @Reference1Id AND {OneTableHandler2.ParentColumnName}= @Reference2Id", param, token);
         }
 
