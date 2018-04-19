@@ -16,8 +16,8 @@ namespace Xlent.Lever.Libraries2.SqlServer
     /// <summary>
     /// Helper class for advanced SELECT statmements
     /// </summary>
-    /// <typeparam name="TDatabaseItem"></typeparam>
-    public class CrudSql<TDatabaseItem> : TableBase<TDatabaseItem>, ICrud<TDatabaseItem, Guid>
+    public class CrudSql<TDatabaseItem> : CrudSql<TDatabaseItem, TDatabaseItem>,
+        ICrud<TDatabaseItem, Guid>
         where TDatabaseItem : IUniquelyIdentifiable<Guid>
     {
         /// <summary>
@@ -26,13 +26,31 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <param name="connectionString"></param>
         /// <param name="tableMetadata"></param>
         public CrudSql(string connectionString, ISqlTableMetadata tableMetadata)
-        :base(connectionString, tableMetadata)
+            : base(connectionString, tableMetadata)
+        {
+            InternalContract.RequireValidated(tableMetadata, nameof(tableMetadata));
+        }
+    }
+
+    /// <summary>
+    /// Helper class for advanced SELECT statmements
+    /// </summary>
+    public class CrudSql<TDatabaseItemCreate, TDatabaseItem> : TableBase<TDatabaseItem>, ICrud<TDatabaseItemCreate, TDatabaseItem, Guid>
+        where TDatabaseItem : TDatabaseItemCreate, IUniquelyIdentifiable<Guid>
+    {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="connectionString"></param>
+        /// <param name="tableMetadata"></param>
+        public CrudSql(string connectionString, ISqlTableMetadata tableMetadata)
+            : base(connectionString, tableMetadata)
         {
             InternalContract.RequireValidated(tableMetadata, nameof(tableMetadata));
         }
 
         /// <inheritdoc />
-        public async Task<Guid> CreateAsync(TDatabaseItem item, CancellationToken token = new CancellationToken())
+        public async Task<Guid> CreateAsync(TDatabaseItemCreate item, CancellationToken token = new CancellationToken())
         {
             var id = Guid.NewGuid();
             await CreateWithSpecifiedIdAsync(id, item, token);
@@ -40,27 +58,28 @@ namespace Xlent.Lever.Libraries2.SqlServer
         }
 
         /// <inheritdoc />
-        public async Task<TDatabaseItem> CreateAndReturnAsync(TDatabaseItem item, CancellationToken token = new CancellationToken())
+        public async Task<TDatabaseItem> CreateAndReturnAsync(TDatabaseItemCreate item, CancellationToken token = new CancellationToken())
         {
             var id = Guid.NewGuid();
             return await CreateWithSpecifiedIdAndReturnAsync(id, item, token);
         }
 
         /// <inheritdoc />
-        public async Task CreateWithSpecifiedIdAsync(Guid id, TDatabaseItem item, CancellationToken token = default(CancellationToken))
+        public async Task CreateWithSpecifiedIdAsync(Guid id, TDatabaseItemCreate item, CancellationToken token = default(CancellationToken))
         {
             InternalContract.RequireNotDefaultValue(id, nameof(id));
             InternalContract.RequireNotNull(item, nameof(item));
-            item.Id = id;
-            StorageHelper.MaybeValidate(item);
-            StorageHelper.MaybeCreateNewEtag(item);
-            StorageHelper.MaybeUpdateTimeStamps(item, true);
+            var dbItem = StorageHelper.DeepCopy<TDatabaseItem, TDatabaseItemCreate>(item);
+            dbItem.Id = id;
+            StorageHelper.MaybeValidate(dbItem);
+            StorageHelper.MaybeCreateNewEtag(dbItem);
+            StorageHelper.MaybeUpdateTimeStamps(dbItem, true);
             var sql = SqlHelper.Create(TableMetadata);
-            await ExecuteAsync(sql, item, token);
+            await ExecuteAsync(sql, dbItem, token);
         }
 
         /// <inheritdoc />
-        public async Task<TDatabaseItem> CreateWithSpecifiedIdAndReturnAsync(Guid id, TDatabaseItem item,
+        public async Task<TDatabaseItem> CreateWithSpecifiedIdAndReturnAsync(Guid id, TDatabaseItemCreate item,
             CancellationToken token = new CancellationToken())
         {
             await CreateWithSpecifiedIdAsync(id, item, token);
@@ -89,7 +108,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         public async Task<IEnumerable<TDatabaseItem>> ReadAllAsync(int limit = 2147483647, CancellationToken token = new CancellationToken())
         {
             return await StorageHelper.ReadPagesAsync<TDatabaseItem>(
-                (offset, cancellationToken) => ReadAllWithPagingAsync(offset, null, cancellationToken), 
+                (offset, cancellationToken) => ReadAllWithPagingAsync(offset, null, cancellationToken),
                 limit, token);
         }
 

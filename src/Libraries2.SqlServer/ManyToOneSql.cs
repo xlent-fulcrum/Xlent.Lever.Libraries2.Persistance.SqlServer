@@ -9,8 +9,29 @@ using Xlent.Lever.Libraries2.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer
 {
-    public class ManyToOneSql<TManyModel, TOneModel> : CrudSql<TManyModel>, IManyToOneRelationComplete<TManyModel, Guid>
-        where TManyModel : class, IUniquelyIdentifiable<Guid> where TOneModel : IUniquelyIdentifiable<Guid>
+    public class ManyToOneSql<TManyModel, TOneModel> : ManyToOneSql<TManyModel, TManyModel, TOneModel>,
+        ICrud<TManyModel, Guid>,
+        IManyToOneRelationComplete<TManyModel, Guid>
+        where TManyModel : IUniquelyIdentifiable<Guid>
+        where TOneModel : IUniquelyIdentifiable<Guid>
+    {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="connectionString"></param>
+        /// <param name="tableMetadata"></param>
+        /// <param name="parentColumnName"></param>
+        /// <param name="oneTableHandler"></param>
+        public ManyToOneSql(string connectionString, ISqlTableMetadata tableMetadata, string parentColumnName,
+            CrudSql<TOneModel> oneTableHandler)
+            : base(connectionString, tableMetadata, parentColumnName, oneTableHandler)
+        {
+        }
+    }
+
+    public class ManyToOneSql<TManyModelCreate, TManyModel, TOneModel> : CrudSql<TManyModelCreate, TManyModel>, IManyToOneRelationComplete<TManyModelCreate, TManyModel, Guid>
+            where TManyModel : TManyModelCreate, IUniquelyIdentifiable<Guid>
+            where TOneModel : IUniquelyIdentifiable<Guid>
     {
         public string ParentColumnName { get; }
         protected CrudSql<TOneModel> OneTableHandler { get; }
@@ -73,7 +94,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         /// <inheritdoc />
         public async Task<IEnumerable<TManyModel>> ReadChildrenAsync(Guid parentId, int limit = int.MaxValue, CancellationToken token = default(CancellationToken))
         {
-            return await StorageHelper.ReadPagesAsync((offset, t)=> ReadChildrenWithPagingAsync(parentId, offset, null, t), limit, token);
+            return await StorageHelper.ReadPagesAsync((offset, t) => ReadChildrenWithPagingAsync(parentId, offset, null, t), limit, token);
         }
 
         /// <inheritdoc />
