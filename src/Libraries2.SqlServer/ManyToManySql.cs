@@ -12,7 +12,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
 {
     public class ManyToManySql<TManyToManyModel, TReferenceModel1, TReferenceModel2> : ManyToManySql<TManyToManyModel, TManyToManyModel, TReferenceModel1, TReferenceModel2>,
         ICrud<TManyToManyModel, Guid>,
-        IManyToManyRelationComplete<TManyToManyModel, TReferenceModel1, TReferenceModel2, Guid>
+        IManyToManyComplete<TManyToManyModel, TReferenceModel1, TReferenceModel2, Guid>
         where TManyToManyModel : class, ITableItem, IValidatable
         where TReferenceModel1 : ITableItem, IValidatable
         where TReferenceModel2 : ITableItem, IValidatable
@@ -34,7 +34,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         }
     }
 
-    public class ManyToManySql<TManyToManyModelCreate, TManyToManyModel, TReferenceModel1, TReferenceModel2> : CrudSql<TManyToManyModelCreate, TManyToManyModel>, IManyToManyRelationComplete<TManyToManyModelCreate, TManyToManyModel, TReferenceModel1, TReferenceModel2, Guid>
+    public class ManyToManySql<TManyToManyModelCreate, TManyToManyModel, TReferenceModel1, TReferenceModel2> : CrudSql<TManyToManyModelCreate, TManyToManyModel>, IManyToManyComplete<TManyToManyModelCreate, TManyToManyModel, TReferenceModel1, TReferenceModel2, Guid>
             where TManyToManyModel : class, TManyToManyModelCreate, ITableItem, IValidatable, IUniquelyIdentifiable<Guid>
             where TReferenceModel1 : ITableItem, IValidatable
             where TReferenceModel2 : ITableItem, IValidatable

@@ -3,7 +3,7 @@ using System.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Xlent.Lever.Libraries2.Core.Application;
 using Xlent.Lever.Libraries2.Core.Crud.Interfaces;
-using Xlent.Lever.Libraries2.Core.Test.NuGet;
+using Xlent.Lever.Libraries2.Core.Test.NuGet.Crud;
 using Xlent.Lever.Libraries2.Core.Test.NuGet.Model;
 using Xlent.Lever.Libraries2.SqlServer;
 using Xlent.Lever.Libraries2.SqlServer.Model;

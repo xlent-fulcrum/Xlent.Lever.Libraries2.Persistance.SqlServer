@@ -69,7 +69,9 @@
     <None Include="app.config" />
     <None Include="CreateAndPublishNuGetPackage.cmd" />
     <None Include="packages.config" />
-    <None Include="Xlent.Lever.Libraries2.SqlServer.nuspec" />
+    <None Include="Xlent.Lever.Libraries2.SqlServer.nuspec">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

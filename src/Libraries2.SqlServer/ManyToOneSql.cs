@@ -11,7 +11,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
 {
     public class ManyToOneSql<TManyModel, TOneModel> : ManyToOneSql<TManyModel, TManyModel, TOneModel>,
         ICrud<TManyModel, Guid>,
-        IManyToOneRelationComplete<TManyModel, Guid>
+        IManyToOneComplete<TManyModel, Guid>
         where TManyModel : IUniquelyIdentifiable<Guid>
         where TOneModel : IUniquelyIdentifiable<Guid>
     {
@@ -29,7 +29,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
         }
     }
 
-    public class ManyToOneSql<TManyModelCreate, TManyModel, TOneModel> : CrudSql<TManyModelCreate, TManyModel>, IManyToOneRelationComplete<TManyModelCreate, TManyModel, Guid>
+    public class ManyToOneSql<TManyModelCreate, TManyModel, TOneModel> : CrudSql<TManyModelCreate, TManyModel>, IManyToOneComplete<TManyModelCreate, TManyModel, Guid>
             where TManyModel : TManyModelCreate, IUniquelyIdentifiable<Guid>
             where TOneModel : IUniquelyIdentifiable<Guid>
     {
