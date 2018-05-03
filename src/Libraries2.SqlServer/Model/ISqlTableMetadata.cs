@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Xlent.Lever.Libraries2.Core.Assert;
+using Xlent.Lever.Libraries2.Core.Storage.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer.Model
 {

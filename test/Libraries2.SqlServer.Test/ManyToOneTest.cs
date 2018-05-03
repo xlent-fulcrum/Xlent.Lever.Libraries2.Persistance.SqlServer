@@ -2,7 +2,7 @@
 using System.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Xlent.Lever.Libraries2.Core.Crud.Interfaces;
-using Xlent.Lever.Libraries2.Core.Test.NuGet;
+using Xlent.Lever.Libraries2.Core.Test.NuGet.ManyToOne;
 using Xlent.Lever.Libraries2.Core.Test.NuGet.Model;
 using Xlent.Lever.Libraries2.SqlServer;
 using Xlent.Lever.Libraries2.SqlServer.Model;
@@ -13,7 +13,7 @@ namespace Libraries2.SqlServer.Test
     public class ManyToOneTest : TestIManyToOne<Guid, Guid?>
     {
         private CrudSql<TestItemId<Guid>> _oneStorage;
-        private IManyToOneRelationComplete<TestItemManyToOneCreate<Guid?>, TestItemManyToOne<Guid, Guid?>, Guid> _manyStorage;
+        private IManyToOneComplete<TestItemManyToOneCreate<Guid?>, TestItemManyToOne<Guid, Guid?>, Guid> _manyStorage;
 
         [TestInitialize]
         public void Inititalize()
@@ -36,11 +36,11 @@ namespace Libraries2.SqlServer.Test
         }
 
         /// <inheritdoc />
-        protected override IManyToOneRelationComplete<TestItemManyToOneCreate<Guid?>, TestItemManyToOne<Guid, Guid?>, Guid>
+        protected override IManyToOneComplete<TestItemManyToOneCreate<Guid?>, TestItemManyToOne<Guid, Guid?>, Guid>
             ManyStorageRecursive => null;
 
         /// <inheritdoc />
-        protected override IManyToOneRelationComplete<TestItemManyToOneCreate<Guid?>, TestItemManyToOne<Guid, Guid?>, Guid>
+        protected override IManyToOneComplete<TestItemManyToOneCreate<Guid?>, TestItemManyToOne<Guid, Guid?>, Guid>
             ManyStorageNonRecursive => _manyStorage;
 
         /// <inheritdoc />
