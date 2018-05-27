@@ -2,9 +2,9 @@
 using System.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Xlent.Lever.Libraries2.Core.Application;
-using Xlent.Lever.Libraries2.Core.Crud.Interfaces;
-using Xlent.Lever.Libraries2.Core.Test.NuGet.Crud;
-using Xlent.Lever.Libraries2.Core.Test.NuGet.Model;
+using Xlent.Lever.Libraries2.Crud.Interfaces;
+using Xlent.Lever.Libraries2.Crud.Test.NuGet.Crud;
+using Xlent.Lever.Libraries2.Crud.Test.NuGet.Model;
 using Xlent.Lever.Libraries2.SqlServer;
 using Xlent.Lever.Libraries2.SqlServer.Model;
 
