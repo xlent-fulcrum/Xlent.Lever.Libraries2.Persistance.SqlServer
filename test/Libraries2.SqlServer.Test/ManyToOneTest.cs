@@ -37,11 +37,11 @@ namespace Libraries2.SqlServer.Test
 
         /// <inheritdoc />
         protected override ICrudManyToOne<TestItemManyToOneCreate<Guid?>, TestItemManyToOne<Guid, Guid?>, Guid>
-            ManyStorageRecursive => null;
+            CrudManyStorageRecursive => null;
 
         /// <inheritdoc />
         protected override ICrudManyToOne<TestItemManyToOneCreate<Guid?>, TestItemManyToOne<Guid, Guid?>, Guid>
-            ManyStorageNonRecursive => _manyStorage;
+            CrudManyStorageNonRecursive => _manyStorage;
 
         /// <inheritdoc />
         protected override ICrd<TestItemId<Guid>, Guid> OneStorage => _oneStorage;
