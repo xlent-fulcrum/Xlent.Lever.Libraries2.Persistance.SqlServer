@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="CrudSql.cs" />
     <Compile Include="ManyToManySql.cs" />
+    <Compile Include="SlaveToMasterSql.cs" />
     <Compile Include="ManyToOneSql.cs" />
     <Compile Include="DoubleForeignTableHandler.cs" />
     <Compile Include="ForeignKeyTableHandler.cs" />
