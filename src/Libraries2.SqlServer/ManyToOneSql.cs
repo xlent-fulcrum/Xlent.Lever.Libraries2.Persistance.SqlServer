@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Xlent.Lever.Libraries2.Core.Crud.Helpers;
-using Xlent.Lever.Libraries2.Core.Crud.Interfaces;
+using Xlent.Lever.Libraries2.Core.Storage.Logic;
+using Xlent.Lever.Libraries2.Crud.Helpers;
+using Xlent.Lever.Libraries2.Crud.Interfaces;
 using Xlent.Lever.Libraries2.Core.Storage.Model;
 using Xlent.Lever.Libraries2.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer
 {
-    public class ManyToOneSql<TManyModel, TOneModel> : ManyToOneSql<TManyModel, TManyModel, TOneModel>,
-        ICrud<TManyModel, Guid>,
-        IManyToOneComplete<TManyModel, Guid>
+    public class ManyToOneSql<TManyModel, TOneModel> :
+        ManyToOneSql<TManyModel, TManyModel, TOneModel>,
+        ICrudManyToOne<TManyModel, Guid>
         where TManyModel : IUniquelyIdentifiable<Guid>
         where TOneModel : IUniquelyIdentifiable<Guid>
     {
@@ -29,7 +30,9 @@ namespace Xlent.Lever.Libraries2.SqlServer
         }
     }
 
-    public class ManyToOneSql<TManyModelCreate, TManyModel, TOneModel> : CrudSql<TManyModelCreate, TManyModel>, IManyToOneComplete<TManyModelCreate, TManyModel, Guid>
+    public class ManyToOneSql<TManyModelCreate, TManyModel, TOneModel> :
+        CrudSql<TManyModelCreate, TManyModel>,
+        ICrudManyToOne<TManyModelCreate, TManyModel, Guid>
             where TManyModel : TManyModelCreate, IUniquelyIdentifiable<Guid>
             where TOneModel : IUniquelyIdentifiable<Guid>
     {
