@@ -182,13 +182,13 @@ namespace Xlent.Lever.Libraries2.SqlServer
         }
 
         /// <inheritdoc />
-        public Task<Lock> ClaimLockAsync(Guid id, CancellationToken token = new CancellationToken())
+        public Task<Lock<Guid>> ClaimLockAsync(Guid id, CancellationToken token = new CancellationToken())
         {
             throw new FulcrumNotImplementedException();
         }
 
         /// <inheritdoc />
-        public Task ReleaseLockAsync(Lock @lock, CancellationToken token = new CancellationToken())
+        public Task ReleaseLockAsync(Guid id, Guid lockId, CancellationToken token = new CancellationToken())
         {
             throw new FulcrumNotImplementedException();
         }

@@ -44,6 +44,6 @@ namespace Libraries2.SqlServer.Test
             CrudManyStorageNonRecursive => _manyStorage;
 
         /// <inheritdoc />
-        protected override ICrd<TestItemId<Guid>, Guid> OneStorage => _oneStorage;
+        protected override ICrud<TestItemId<Guid>, Guid> OneStorage => _oneStorage;
     }
 }

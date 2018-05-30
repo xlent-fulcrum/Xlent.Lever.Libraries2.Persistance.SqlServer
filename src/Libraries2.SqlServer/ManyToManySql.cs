@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Xlent.Lever.Libraries2.Core.Assert;
+using Xlent.Lever.Libraries2.Core.Error.Logic;
 using Xlent.Lever.Libraries2.Core.Storage.Logic;
 using Xlent.Lever.Libraries2.Crud.Helpers;
 using Xlent.Lever.Libraries2.Crud.Interfaces;
@@ -13,7 +14,7 @@ namespace Xlent.Lever.Libraries2.SqlServer
 {
     public class ManyToManySql<TManyToManyModel, TReferenceModel1, TReferenceModel2> : ManyToManySql<TManyToManyModel, TManyToManyModel, TReferenceModel1, TReferenceModel2>,
         ICrud<TManyToManyModel, Guid>,
-        IManyToManyComplete<TManyToManyModel, TReferenceModel1, TReferenceModel2, Guid>
+        ICrudManyToMany<TManyToManyModel, TReferenceModel1, TReferenceModel2, Guid>
         where TManyToManyModel : class, ITableItem, IValidatable
         where TReferenceModel1 : ITableItem, IValidatable
         where TReferenceModel2 : ITableItem, IValidatable
@@ -35,7 +36,9 @@ namespace Xlent.Lever.Libraries2.SqlServer
         }
     }
 
-    public class ManyToManySql<TManyToManyModelCreate, TManyToManyModel, TReferenceModel1, TReferenceModel2> : CrudSql<TManyToManyModelCreate, TManyToManyModel>, IManyToManyComplete<TManyToManyModelCreate, TManyToManyModel, TReferenceModel1, TReferenceModel2, Guid>
+    public class ManyToManySql<TManyToManyModelCreate, TManyToManyModel, TReferenceModel1, TReferenceModel2> : 
+        CrudSql<TManyToManyModelCreate, TManyToManyModel>, 
+        ICrudManyToMany<TManyToManyModelCreate, TManyToManyModel, TReferenceModel1, TReferenceModel2, Guid>
             where TManyToManyModel : class, TManyToManyModelCreate, ITableItem, IValidatable, IUniquelyIdentifiable<Guid>
             where TReferenceModel1 : ITableItem, IValidatable
             where TReferenceModel2 : ITableItem, IValidatable
@@ -60,15 +63,39 @@ namespace Xlent.Lever.Libraries2.SqlServer
         }
 
         #region The reference table (the many-to-many table)
-        /// <summary>
-        /// Get the item that has the specified <paramref name="reference1Id"/> and <paramref name="reference2Id"/>.
-        /// </summary>
+
+        /// <inheritdoc />
+        public Task CreateWithSpecifiedIdAsync(Guid masterId, Guid slaveId, TManyToManyModelCreate item,
+            CancellationToken token = new CancellationToken())
+        {
+            InternalContract.RequireNotDefaultValue(masterId, nameof(masterId));
+            InternalContract.RequireNotDefaultValue(slaveId, nameof(slaveId));
+            InternalContract.RequireNotNull(item, nameof(item));
+            InternalContract.RequireValidated(item, nameof(item));
+            return CreateAsync(item, token);
+        }
+
+        /// <inheritdoc />
+        public Task<TManyToManyModel> CreateWithSpecifiedIdAndReturnAsync(Guid masterId, Guid slaveId, TManyToManyModelCreate item,
+            CancellationToken token = new CancellationToken())
+        {
+            InternalContract.RequireNotDefaultValue(masterId, nameof(masterId));
+            InternalContract.RequireNotDefaultValue(slaveId, nameof(slaveId));
+            InternalContract.RequireNotNull(item, nameof(item));
+            InternalContract.RequireValidated(item, nameof(item));
+            return CreateAndReturnAsync(item, token);
+        }
+
+        /// <inheritdoc />
         public async Task<TManyToManyModel> ReadAsync(Guid reference1Id, Guid reference2Id, CancellationToken token = default(CancellationToken))
         {
+            InternalContract.RequireNotDefaultValue(reference1Id, nameof(reference1Id));
+            InternalContract.RequireNotDefaultValue(reference2Id, nameof(reference2Id));
             var param = new { Reference1Id = reference1Id, Reference2Id = reference2Id };
             return await SearchWhereSingle($"{OneTableHandler1.ParentColumnName} = @Reference1Id AND {OneTableHandler2.ParentColumnName}= @Reference2Id", param, token);
         }
 
+        /// <inheritdoc />
         public async Task<PageEnvelope<TManyToManyModel>> ReadByReference1WithPagingAsync(Guid id, int offset, int? limit = null, CancellationToken token = default(CancellationToken))
         {
             return await OneTableHandler1.ReadChildrenWithPagingAsync(id, offset, limit, token);
@@ -90,6 +117,42 @@ namespace Xlent.Lever.Libraries2.SqlServer
         public async Task<IEnumerable<TManyToManyModel>> ReadByReference2Async(Guid id, int limit = int.MaxValue, CancellationToken token = default(CancellationToken))
         {
             return await StorageHelper.ReadPagesAsync((offset, t) => ReadByReference2WithPagingAsync(id, offset, null, t), limit, token);
+        }
+
+        /// <inheritdoc />
+        public async Task UpdateAsync(Guid masterId, Guid slaveId, TManyToManyModel item, CancellationToken token = new CancellationToken())
+        {
+            InternalContract.RequireNotDefaultValue(masterId, nameof(masterId));
+            InternalContract.RequireNotDefaultValue(slaveId, nameof(slaveId));
+            InternalContract.RequireNotNull(item, nameof(item));
+            InternalContract.RequireValidated(item, nameof(item));
+            var existingItem = await ReadAsync(masterId, slaveId, token);
+            if (Equals(existingItem, default(TManyToManyModel))) throw new FulcrumNotFoundException($"Could not find the item with reference 1 = {masterId} and reference 2 = {slaveId}.");
+            var id = existingItem.Id;
+            await UpdateAsync(id, item, token);
+        }
+
+        /// <inheritdoc />
+        public async Task<TManyToManyModel> UpdateAndReturnAsync(Guid masterId, Guid slaveId, TManyToManyModel item,
+            CancellationToken token = new CancellationToken())
+        {
+            InternalContract.RequireNotDefaultValue(masterId, nameof(masterId));
+            InternalContract.RequireNotDefaultValue(slaveId, nameof(slaveId));
+            InternalContract.RequireNotNull(item, nameof(item));
+            InternalContract.RequireValidated(item, nameof(item));
+            var existingItem = await ReadAsync(masterId, slaveId, token);
+            if (Equals(existingItem, default(TManyToManyModel))) throw new FulcrumNotFoundException($"Could not find the item with reference 1 = {masterId} and reference 2 = {slaveId}.");
+            var id = existingItem.Id;
+            return await UpdateAndReturnAsync(id, item, token);
+        }
+
+        /// <inheritdoc />
+        public Task DeleteAsync(Guid masterId, Guid slaveId, CancellationToken token = new CancellationToken())
+        {
+            var param = new { Reference1Id = masterId, Reference2Id = slaveId };
+            return DeleteWhereAsync(
+                $"{OneTableHandler1.ParentColumnName} = @Reference1Id AND {OneTableHandler2.ParentColumnName}= @Reference2Id",
+                param, token);
         }
 
         /// <inheritdoc />
