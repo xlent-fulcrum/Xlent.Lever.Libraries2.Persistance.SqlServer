@@ -8,6 +8,7 @@ using Xlent.Lever.Libraries2.Core.Storage.Logic;
 using Xlent.Lever.Libraries2.Crud.Helpers;
 using Xlent.Lever.Libraries2.Crud.Interfaces;
 using Xlent.Lever.Libraries2.Core.Storage.Model;
+using Xlent.Lever.Libraries2.Crud.Model;
 using Xlent.Lever.Libraries2.SqlServer.Model;
 
 namespace Xlent.Lever.Libraries2.SqlServer
@@ -130,6 +131,18 @@ namespace Xlent.Lever.Libraries2.SqlServer
         public Task DeleteChildrenAsync(Guid parentId, CancellationToken token = default(CancellationToken))
         {
             return DeleteWhereAsync("[{ParentColumnName}] = @ParentId", new { ParentId = parentId }, token);
+        }
+
+        /// <inheritdoc />
+        public Task<SlaveLock<Guid>> ClaimLockAsync(Guid masterId, Guid slaveId, CancellationToken token = new CancellationToken())
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task ReleaseLockAsync(Guid masterId, Guid slaveId, Guid lockId, CancellationToken token = new CancellationToken())
+        {
+            throw new NotImplementedException();
         }
     }
 }
