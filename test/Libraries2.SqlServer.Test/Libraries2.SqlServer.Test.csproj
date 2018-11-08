@@ -55,10 +55,10 @@
       <HintPath>..\..\packages\Xlent.Lever.Libraries2.Core.NetFramework.2.5.5\lib\net46\Xlent.Lever.Libraries2.Core.NetFramework.dll</HintPath>
     </Reference>
     <Reference Include="Xlent.Lever.Libraries2.Crud.NetFramework, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xlent.Lever.Libraries2.Crud.NetFramework.1.4.1-rc\lib\net46\Xlent.Lever.Libraries2.Crud.NetFramework.dll</HintPath>
+      <HintPath>..\..\packages\Xlent.Lever.Libraries2.Crud.NetFramework.1.4.1\lib\net46\Xlent.Lever.Libraries2.Crud.NetFramework.dll</HintPath>
     </Reference>
     <Reference Include="Xlent.Lever.Libraries2.Crud.Test.NuGet, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xlent.Lever.Libraries2.Crud.Test.1.1.1\lib\net46\Xlent.Lever.Libraries2.Crud.Test.NuGet.dll</HintPath>
+      <HintPath>..\..\packages\Xlent.Lever.Libraries2.Crud.Test.1.1.2\lib\net46\Xlent.Lever.Libraries2.Crud.Test.NuGet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
